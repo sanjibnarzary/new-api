@@ -1,26 +1,26 @@
-# constant 包 (`/constant`)
+# Constant Package (`/constant`)
 
-该目录仅用于放置全局可复用的**常量定义**，不包含任何业务逻辑或依赖关系。
+This directory is solely for placing globally reusable **constant definitions** and does not contain any business logic or dependencies.
 
-## 当前文件
+## Current Files
 
-| 文件                   | 说明                                                                  |
-|----------------------|---------------------------------------------------------------------|
-| `azure.go`           | 定义与 Azure 相关的全局常量，如 `AzureNoRemoveDotTime`（控制删除 `.` 的截止时间）。         |
-| `cache_key.go`       | 缓存键格式字符串及 Token 相关字段常量，统一缓存命名规则。                                    |
-| `channel_setting.go` | Channel 级别的设置键，如 `proxy`、`force_format` 等。                          |
-| `context_key.go`     | 定义 `ContextKey` 类型以及在整个项目中使用的上下文键常量（请求时间、Token/Channel/User 相关信息等）。 |
-| `env.go`             | 环境配置相关的全局变量，在启动阶段根据配置文件或环境变量注入。                                     |
-| `finish_reason.go`   | OpenAI/GPT 请求返回的 `finish_reason` 字符串常量集合。                           |
-| `midjourney.go`      | Midjourney 相关错误码及动作(Action)常量与模型到动作的映射表。                            |
-| `setup.go`           | 标识项目是否已完成初始化安装 (`Setup` 布尔值)。                                       |
-| `task.go`            | 各种任务(Task)平台、动作常量及模型与动作映射表，如 Suno、Midjourney 等。                     |
-| `user_setting.go`    | 用户设置相关键常量以及通知类型(Email/Webhook)等。                                    |
+| File                 | Description                                                                 |
+|----------------------|-----------------------------------------------------------------------------|
+| `azure.go`           | Defines global constants related to Azure, such as `AzureNoRemoveDotTime` (controls the cutoff time for deleting '.'). |
+| `cache_key.go`       | Cache key format strings and Token-related field constants, unifying cache naming conventions. |
+| `channel_setting.go` | Channel-level setting keys, such as `proxy`, `force_format`, etc.             |
+| `context_key.go`     | Defines the `ContextKey` type and context key constants used throughout the project (request time, Token/Channel/User related information, etc.). |
+| `env.go`             | Global variables related to environment configuration, injected during the startup phase based on configuration files or environment variables. |
+| `finish_reason.go`   | A collection of `finish_reason` string constants returned by OpenAI/GPT requests. |
+| `midjourney.go`      | Midjourney-related error codes and action (Action) constants, and a mapping table from models to actions. |
+| `setup.go`           | Indicates whether the project has completed initial installation (`Setup` boolean value). |
+| `task.go`            | Constants for various task platforms, actions, and mapping tables from models to actions, such as Suno, Midjourney, etc. |
+| `user_setting.go`    | Key constants for user settings and notification types (Email/Webhook), etc.    |
 
-## 使用约定
+## Usage Conventions
 
-1. `constant` 包**只能被其他包引用**（import），**禁止在此包中引用项目内的其他自定义包**。如确有需要，仅允许引用 **Go 标准库**。
-2. 不允许在此目录内编写任何与业务流程、数据库操作、第三方服务调用等相关的逻辑代码。
-3. 新增类型时，请保持命名语义清晰，并在本 README 的 **当前文件** 表格中补充说明，确保团队成员能够快速了解其用途。
+1. The `constant` package **can only be imported by other packages**. **It is forbidden to import other custom packages within this project into this package**. If necessary, only importing the **Go standard library** is allowed.
+2. It is not allowed to write any logic code related to business processes, database operations, third-party service calls, etc., in this directory.
+3. When adding new types, please keep the naming semantics clear and add a description to the **Current Files** table in this README to ensure team members can quickly understand their purpose.
 
-> ⚠️ 违反以上约定将导致包之间产生不必要的耦合，影响代码可维护性与可测试性。请在提交代码前自行检查。
+> ⚠️ Violating the above conventions will lead to unnecessary coupling between packages, affecting code maintainability and testability. Please check your code before submitting.

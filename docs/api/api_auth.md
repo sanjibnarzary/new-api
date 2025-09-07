@@ -1,46 +1,46 @@
-# API 鉴权文档
+# API Authentication Documentation
 
-## 认证方式
+## Authentication Method
 
 ### Access Token
 
-对于需要鉴权的 API 接口，必须同时提供以下两个请求头来进行 Access Token 认证：
+For API interfaces that require authentication, the following two request headers must be provided simultaneously for Access Token authentication:
 
-1. **请求头中的 `Authorization` 字段**
+1.  **`Authorization` field in the request header**
 
-    将 Access Token 放置于 HTTP 请求头部的 `Authorization` 字段中，格式如下：
+    Place the Access Token in the `Authorization` field of the HTTP request header, in the following format:
 
     ```
     Authorization: <your_access_token>
     ```
 
-    其中 `<your_access_token>` 需要替换为实际的 Access Token 值。
+    Where `<your_access_token>` needs to be replaced with the actual Access Token value.
 
-2. **请求头中的 `New-Api-User` 字段**
+2.  **`New-Api-User` field in the request header**
 
-    将用户 ID 放置于 HTTP 请求头部的 `New-Api-User` 字段中，格式如下：
+    Place the user ID in the `New-Api-User` field of the HTTP request header, in the following format:
 
     ```
     New-Api-User: <your_user_id>
     ```
 
-    其中 `<your_user_id>` 需要替换为实际的用户 ID。
+    Where `<your_user_id>` needs to be replaced with the actual user ID.
 
-**注意：**
+**Note:**
 
-*   **必须同时提供 `Authorization` 和 `New-Api-User` 两个请求头才能通过鉴权。**
-*   如果只提供其中一个请求头，或者两个请求头都未提供，则会返回 `401 Unauthorized` 错误。
-*   如果 `Authorization` 中的 Access Token 无效，则会返回 `401 Unauthorized` 错误，并提示“无权进行此操作，access token 无效”。
-*   如果 `New-Api-User` 中的用户 ID 与 Access Token 不匹配，则会返回 `401 Unauthorized` 错误，并提示“无权进行此操作，与登录用户不匹配，请重新登录”。
-*   如果没有提供 `New-Api-User` 请求头，则会返回 `401 Unauthorized` 错误，并提示“无权进行此操作，未提供 New-Api-User”。
-*   如果 `New-Api-User` 请求头格式错误，则会返回 `401 Unauthorized` 错误，并提示“无权进行此操作，New-Api-User 格式错误”。
-*   如果用户已被禁用，则会返回 `403 Forbidden` 错误，并提示“用户已被封禁”。
-*   如果用户权限不足，则会返回 `403 Forbidden` 错误，并提示“无权进行此操作，权限不足”。
-*   如果用户信息无效，则会返回 `403 Forbidden` 错误，并提示“无权进行此操作，用户信息无效”。
+*   **Both `Authorization` and `New-Api-User` request headers must be provided to pass authentication.**
+*   If only one of the request headers is provided, or if neither is provided, a `401 Unauthorized` error will be returned.
+*   If the Access Token in `Authorization` is invalid, a `401 Unauthorized` error will be returned with the message "Permission denied, access token is invalid".
+*   If the user ID in `New-Api-User` does not match the Access Token, a `401 Unauthorized` error will be returned with the message "Permission denied, does not match the logged-in user, please log in again".
+*   If the `New-Api-User` request header is not provided, a `401 Unauthorized` error will be returned with the message "Permission denied, New-Api-User not provided".
+*   If the `New-Api-User` request header format is incorrect, a `401 Unauthorized` error will be returned with the message "Permission denied, New-Api-User format is incorrect".
+*   If the user has been disabled, a `403 Forbidden` error will be returned with the message "User has been banned".
+*   If the user's permissions are insufficient, a `403 Forbidden` error will be returned with the message "Permission denied, insufficient permissions".
+*   If the user information is invalid, a `403 Forbidden` error will be returned with the message "Permission denied, user information is invalid".
 
-## Curl 示例
+## Curl Example
 
-假设您的 Access Token 为 `access_token`，用户 ID 为 `123`，要访问的 API 接口为 `/api/user/self`，则可以使用以下 curl 命令：
+Assuming your Access Token is `access_token`, your user ID is `123`, and the API interface to be accessed is `/api/user/self`, you can use the following curl command:
 
 ```bash
 curl -X GET \
@@ -49,5 +49,4 @@ curl -X GET \
   https://your-domain.com/api/user/self
 ```
 
-请将 `access_token`、`123` 和 `https://your-domain.com` 替换为实际的值。
-
+Please replace `access_token`, `123`, and `https://your-domain.com` with the actual values.
