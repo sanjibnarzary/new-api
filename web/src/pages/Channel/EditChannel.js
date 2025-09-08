@@ -685,7 +685,7 @@ const EditChannel = (props) => {
             }
           }
         }}
-      >{t('批量创建')}</Checkbox>
+      >{t('Bacth Create')}</Checkbox>
       {/*{batch && (*/}
       {/*  <Checkbox disabled={isEdit} checked={multiToSingle} onChange={() => {*/}
       {/*    setMultiToSingle(prev => !prev);*/}
@@ -775,9 +775,9 @@ const EditChannel = (props) => {
         placement={isEdit ? 'right' : 'left'}
         title={
           <Space>
-            <Tag color="blue" shape="circle">{isEdit ? t('编辑') : t('新建')}</Tag>
+            <Tag color="blue" shape="circle">{isEdit ? t('Edit') : t('Create')}</Tag>
             <Title heading={4} className="m-0">
-              {isEdit ? t('更新渠道信息') : t('创建新的渠道')}
+              {isEdit ? t('Update Channel Information') : t('Create New Channel')}
             </Title>
           </Space>
         }
@@ -792,7 +792,7 @@ const EditChannel = (props) => {
                 onClick={() => formApiRef.current?.submitForm()}
                 icon={<IconSave />}
               >
-                {t('提交')}
+                {t('Submit')}
               </Button>
               <Button
                 theme="light"
@@ -800,7 +800,7 @@ const EditChannel = (props) => {
                 onClick={handleCancel}
                 icon={<IconClose />}
               >
-                {t('取消')}
+                {t('Cancel')}
               </Button>
             </Space>
           </div>
@@ -831,9 +831,9 @@ const EditChannel = (props) => {
 
                   <Form.Select
                     field='type'
-                    label={t('类型')}
-                    placeholder={t('请选择渠道类型')}
-                    rules={[{ required: true, message: t('请选择渠道类型') }]}
+                    label={t('Type')}
+                    placeholder={t('Please select channel type')}
+                    rules={[{ required: true, message: t('Please select channel type') }]}
                     optionList={channelOptionList}
                     style={{ width: '100%' }}
                     filter
@@ -845,9 +845,9 @@ const EditChannel = (props) => {
 
                   <Form.Input
                     field='name'
-                    label={t('名称')}
-                    placeholder={t('请为渠道命名')}
-                    rules={[{ required: true, message: t('请为渠道命名') }]}
+                    label={t('Name')}
+                    placeholder={t('Please name the channel')}
+                    rules={[{ required: true, message: t('Please name the channel') }]}
                     showClear
                     onChange={(value) => handleInputChange('name', value)}
                     autoComplete='new-password'
@@ -857,27 +857,27 @@ const EditChannel = (props) => {
                     inputs.type === 41 ? (
                       <Form.Upload
                         field='vertex_files'
-                        label={t('密钥文件 (.json)')}
+                        label={t('Key file (.json)')}
                         accept='.json'
                         multiple
                         draggable
                         dragIcon={<IconBolt />}
-                        dragMainText={t('点击上传文件或拖拽文件到这里')}
-                        dragSubText={t('仅支持 JSON 文件，支持多文件')}
+                        dragMainText={t('Click to upload file or drag and drop file here')}
+                        dragSubText={t('Only JSON files are supported, multiple files are supported')}
                         style={{ marginTop: 10 }}
                         uploadTrigger='custom'
                         beforeUpload={() => false}
                         onChange={handleVertexUploadChange}
                         fileList={vertexFileList}
-                        rules={isEdit ? [] : [{ required: true, message: t('请上传密钥文件') }]}
+                        rules={isEdit ? [] : [{ required: true, message: t('Please upload the key file') }]}
                         extraText={batchExtra}
                       />
                     ) : (
                       <Form.TextArea
                         field='key'
-                        label={t('密钥')}
-                        placeholder={t('请输入密钥，一行一个')}
-                        rules={isEdit ? [] : [{ required: true, message: t('请输入密钥') }]}
+                        label={t('Key')}
+                        placeholder={t('Enter keys, one per line')}
+                        rules={isEdit ? [] : [{ required: true, message: t('Enter key') }]}
                         autosize
                         autoComplete='new-password'
                         onChange={(value) => handleInputChange('key', value)}
@@ -891,7 +891,7 @@ const EditChannel = (props) => {
                         <>
                           {!batch && (
                             <div className="flex items-center justify-between mb-3">
-                              <Text className="text-sm font-medium">{t('密钥输入方式')}</Text>
+                              <Text className="text-sm font-medium">{t('Key input method')}</Text>
                               <Space>
                                 <Button
                                   size="small"
@@ -905,7 +905,7 @@ const EditChannel = (props) => {
                                     handleInputChange('key', '');
                                   }}
                                 >
-                                  {t('文件上传')}
+                                  {t('File upload')}
                                 </Button>
                                 <Button
                                   size="small"
@@ -921,7 +921,7 @@ const EditChannel = (props) => {
                                     setInputs((prev) => ({ ...prev, vertex_files: [] }));
                                   }}
                                 >
-                                  {t('手动输入')}
+                                  {t('Manual entry')}
                                 </Button>
                               </Space>
                             </div>
@@ -930,7 +930,7 @@ const EditChannel = (props) => {
                           {batch && (
                             <Banner
                               type='info'
-                              description={t('批量创建模式下仅支持文件上传，不支持手动输入')}
+                              description={t('In batch creation mode, only file upload is supported, manual input is not supported')}
                               className='!rounded-lg mb-3'
                             />
                           )}
@@ -938,15 +938,15 @@ const EditChannel = (props) => {
                           {useManualInput && !batch ? (
                             <Form.TextArea
                               field='key'
-                              label={isEdit ? t('密钥（编辑模式下，保存的密钥不会显示）') : t('密钥')}
-                              placeholder={t('请输入 JSON 格式的密钥内容，例如：\n{\n  "type": "service_account",\n  "project_id": "your-project-id",\n  "private_key_id": "...",\n  "private_key": "...",\n  "client_email": "...",\n  "client_id": "...",\n  "auth_uri": "...",\n  "token_uri": "...",\n  "auth_provider_x509_cert_url": "...",\n  "client_x509_cert_url": "..."\n}')}
-                              rules={isEdit ? [] : [{ required: true, message: t('请输入密钥') }]}
+                              label={isEdit ? t('Key (In edit mode, the saved key will not be displayed)') : t('Key')}
+                              placeholder={t('Please enter the key content in JSON format, for example: \n{\n  "type": "service_account",\n  "project_id": "your-project-id",\n  "private_key_id": "...",\n  "private_key": "...",\n  "client_email": "...",\n  "client_id": "...",\n  "auth_uri": "...",\n  "token_uri": "...",\n  "auth_provider_x509_cert_url": "...",\n  "client_x509_cert_url": "..."\n}')}
+                              rules={isEdit ? [] : [{ required: true, message: t('Enter key') }]}
                               autoComplete='new-password'
                               onChange={(value) => handleInputChange('key', value)}
                               extraText={
                                 <div className="flex items-center gap-2">
                                   <Text type="tertiary" size="small">
-                                    {t('请输入完整的 JSON 格式密钥内容')}
+                                    {t('Please enter the complete key content in JSON format. ')}
                                   </Text>
                                   {batchExtra}
                                 </div>
@@ -957,18 +957,18 @@ const EditChannel = (props) => {
                           ) : (
                             <Form.Upload
                               field='vertex_files'
-                              label={t('密钥文件 (.json)')}
+                              label={t('Key file (.json)')}
                               accept='.json'
                               draggable
                               dragIcon={<IconBolt />}
-                              dragMainText={t('点击上传文件或拖拽文件到这里')}
-                              dragSubText={t('仅支持 JSON 文件')}
+                              dragMainText={t('Click to upload file or drag and drop file here')}
+                              dragSubText={t('Only JSON files are supported')}
                               style={{ marginTop: 10 }}
                               uploadTrigger='custom'
                               beforeUpload={() => false}
                               onChange={handleVertexUploadChange}
                               fileList={vertexFileList}
-                              rules={isEdit ? [] : [{ required: true, message: t('请上传密钥文件') }]}
+                              rules={isEdit ? [] : [{ required: true, message: t('Please upload the key file') }]}
                               extraText={batchExtra}
                             />
                           )}
@@ -976,9 +976,9 @@ const EditChannel = (props) => {
                       ) : (
                         <Form.Input
                           field='key'
-                          label={isEdit ? t('密钥（编辑模式下，保存的密钥不会显示）') : t('密钥')}
+                          label={isEdit ? t('Key (In edit mode, the saved key will not be displayed)') : t('密钥')}
                           placeholder={t(type2secretPrompt(inputs.type))}
-                          rules={isEdit ? [] : [{ required: true, message: t('请输入密钥') }]}
+                          rules={isEdit ? [] : [{ required: true, message: t('Enter key') }]}
                           autoComplete='new-password'
                           onChange={(value) => handleInputChange('key', value)}
                           extraText={batchExtra}
@@ -992,11 +992,11 @@ const EditChannel = (props) => {
                     <>
                       <Form.Select
                         field='multi_key_mode'
-                        label={t('密钥聚合模式')}
-                        placeholder={t('请选择多密钥使用策略')}
+                        label={t('Key aggregation mode')}
+                        placeholder={t('Please select a multi-key usage strategy')}
                         optionList={[
-                          { label: t('随机'), value: 'random' },
-                          { label: t('轮询'), value: 'polling' },
+                          { label: t('Random'), value: 'random' },
+                          { label: t('Polling'), value: 'polling' },
                         ]}
                         style={{ width: '100%' }}
                         value={inputs.multi_key_mode || 'random'}
@@ -1008,7 +1008,7 @@ const EditChannel = (props) => {
                       {inputs.multi_key_mode === 'polling' && (
                         <Banner
                           type='warning'
-                          description={t('轮询模式必须搭配Redis和内存缓存功能使用，否则性能将大幅降低，并且无法实现轮询功能')}
+                          description={t('Polling mode must be used with Redis and memory cache functions, otherwise the performance will be greatly reduced and the polling function will not be implemented.')}
                           className='!rounded-lg mt-2'
                         />
                       )}
@@ -1018,8 +1018,8 @@ const EditChannel = (props) => {
                   {inputs.type === 18 && (
                     <Form.Input
                       field='other'
-                      label={t('模型版本')}
-                      placeholder={'请输入星火大模型版本，注意是接口地址中的版本号，例如：v2.1'}
+                      label={t('Model Version')}
+                      placeholder={'Please enter the version of the Starfire model, note that it is the version number in the interface address, for example: v2.1'}
                       onChange={(value) => handleInputChange('other', value)}
                       showClear
                     />
@@ -1028,19 +1028,19 @@ const EditChannel = (props) => {
                   {inputs.type === 41 && (
                     <Form.TextArea
                       field='other'
-                      label={t('部署地区')}
+                      label={t('Deployment Region')}
                       placeholder={t(
-                        '请输入部署地区，例如：us-central1\n支持使用模型映射格式\n{\n    "default": "us-central1",\n    "claude-3-5-sonnet-20240620": "europe-west1"\n}'
+                        'Please enter deployment region, e.g.: us-central1\nSupports model mapping format\n{\n    "default": "us-central1",\n    "claude-3-5-sonnet-20240620": "europe-west1"\n}'
                       )}
                       autosize
                       onChange={(value) => handleInputChange('other', value)}
-                      rules={[{ required: true, message: t('请填写部署地区') }]}
+                      rules={[{ required: true, message: t('Please fill in the deployment region') }]}
                       extraText={
                         <Text
                           className="!text-semi-color-primary cursor-pointer"
                           onClick={() => handleInputChange('other', JSON.stringify(REGION_EXAMPLE, null, 2))}
                         >
-                          {t('填入模板')}
+                          {t('Fill Template')}
                         </Text>
                       }
                       showClear

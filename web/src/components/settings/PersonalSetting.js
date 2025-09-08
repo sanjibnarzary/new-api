@@ -1133,7 +1133,7 @@ const PersonalSetting = () => {
                                   onChange={(val) =>
                                     handleNotificationSettingChange('webhookSecret', val)
                                   }
-                                  placeholder={t('请输入密钥')}
+                                  placeholder={t('Enter key')}
                                   size="large"
                                   className="!rounded-lg"
                                   prefix={<IconKey />}
