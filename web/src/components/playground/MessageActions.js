@@ -71,7 +71,7 @@ const MessageActions = ({
             onClick={() => !shouldDisableActions && onMessageEdit(message)}
             disabled={shouldDisableActions}
             className={`!rounded-full ${shouldDisableActions ? '!text-gray-300 !cursor-not-allowed' : '!text-gray-400 hover:!text-yellow-600 hover:!bg-yellow-50'} ${styleState.isMobile ? '!w-6 !h-6' : '!w-7 !h-7'} !p-0 transition-all`}
-            aria-label={t('编辑')}
+            aria-label={t('Edit')}
           />
         </Tooltip>
       )}

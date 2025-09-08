@@ -58,21 +58,21 @@ function type2secretPrompt(type) {
   // inputs.type === 15 ? '按照如下格式输入：APIKey|SecretKey' : (inputs.type === 18 ? '按照如下格式输入：APPID|APISecret|APIKey' : '请输入渠道对应的鉴权密钥')
   switch (type) {
     case 15:
-      return '按照如下格式输入：APIKey|SecretKey';
+      return 'Enter in the following format: APIKey|SecretKey';
     case 18:
-      return '按照如下格式输入：APPID|APISecret|APIKey';
+      return 'Enter in the following format: APPID|APISecret|APIKey';
     case 22:
-      return '按照如下格式输入：APIKey-AppId，例如：fastgpt-0sp2gtvfdgyi4k30jwlgwf1i-64f335d84283f05518e9e041';
+      return 'Enter in the following format: APIKey-AppId，For example: fastgpt-0sp2gtvfdgyi4k30jwlgwf1i-64f335d84283f05518e9e041';
     case 23:
-      return '按照如下格式输入：AppId|SecretId|SecretKey';
+      return 'Enter in the following format: AppId|SecretId|SecretKey';
     case 33:
-      return '按照如下格式输入：Ak|Sk|Region';
+      return 'Enter in the following format: Ak|Sk|Region';
     case 50:
-      return '按照如下格式输入: AccessKey|SecretKey';
+      return 'Enter in the following format:  AccessKey|SecretKey';
     case 51:
-      return '按照如下格式输入: Access Key ID|Secret Access Key';
+      return 'Enter in the following format:  Access Key ID|Secret Access Key';
     default:
-      return '请输入渠道对应的鉴权密钥';
+      return 'Please enter the authentication key corresponding to the channel';
   }
 }
 
@@ -136,9 +136,9 @@ const EditChannel = (props) => {
 
     if (name === 'base_url' && value.endsWith('/v1')) {
       Modal.confirm({
-        title: '警告',
+        title: 'Warning',
         content:
-          '不需要在末尾加/v1，New API会自动处理，添加后可能导致请求失败，是否继续？',
+          'There is no need to add /v1 at the end. The New API will automatically handle this. Adding it may cause the request to fail. Do you want to continue?',
         onOk: () => {
           setInputs((inputs) => ({ ...inputs, [name]: value }));
         },
@@ -275,7 +275,7 @@ const EditChannel = (props) => {
     } else {
       // 如果是新建模式，通过后端代理获取模型列表
       if (!inputs?.['key']) {
-        showError(t('请填写密钥'));
+        showError(t('Please enter the key'));
         err = true;
       } else {
         try {
@@ -303,9 +303,9 @@ const EditChannel = (props) => {
 
     if (!err) {
       handleInputChange(name, Array.from(new Set(models)));
-      showSuccess(t('获取模型列表成功'));
+      showSuccess(t('Successfully retrieved model list'));
     } else {
-      showError(t('获取模型列表失败'));
+      showError(t('Failed to retrieve model list'));
     }
     setLoading(false);
   };
@@ -466,7 +466,7 @@ const EditChannel = (props) => {
       setInputs((prev) => ({ ...prev, vertex_files: validFiles }));
 
       if (errorNames.length > 0) {
-        showError(t('以下文件解析失败，已忽略：{{list}}', { list: errorNames.join(', ') }));
+        showError(t('The following files failed to parse and have been ignored: {{list}}', { list: errorNames.join(', ') }));
       }
     })();
   };
@@ -485,11 +485,11 @@ const EditChannel = (props) => {
             // 确保是有效的密钥格式
             localInputs.key = JSON.stringify(parsedKey);
           } catch (err) {
-            showError(t('密钥格式无效，请输入有效的 JSON 格式密钥'));
+            showError(t('The key format is invalid, please enter a valid key in JSON format'));
             return;
           }
         } else if (!isEdit) {
-          showInfo(t('请输入密钥！'));
+          showInfo(t('Please enter the key'));
           return;
         }
       } else {
@@ -509,7 +509,7 @@ const EditChannel = (props) => {
             );
             keys = parsed.filter(Boolean);
           } catch (err) {
-            showError(t('解析密钥文件失败: {{msg}}', { msg: err.message }));
+            showError(t('Failed to parse the key file: {{msg}}', { msg: err.message }));
             return;
           }
         }
@@ -517,7 +517,7 @@ const EditChannel = (props) => {
         // 创建模式必须上传密钥；编辑模式可选
         if (keys.length === 0) {
           if (!isEdit) {
-            showInfo(t('请上传密钥文件！'));
+            showInfo(t('Please upload the key file'));
             return;
           } else {
             // 编辑模式且未上传新密钥，不修改 key
@@ -541,15 +541,15 @@ const EditChannel = (props) => {
     delete localInputs.vertex_files;
 
     if (!isEdit && (!localInputs.name || !localInputs.key)) {
-      showInfo(t('请填写渠道名称和渠道密钥！'));
+      showInfo(t('Please enter channel name and key! '));
       return;
     }
     if (!Array.isArray(localInputs.models) || localInputs.models.length === 0) {
-      showInfo(t('请至少选择一个模型！'));
+      showInfo(t('Please select at least one model! '));
       return;
     }
     if (localInputs.model_mapping && localInputs.model_mapping !== '' && !verifyJSON(localInputs.model_mapping)) {
-      showInfo(t('模型映射必须是合法的 JSON 格式！'));
+      showInfo(t('Model mapping must be in valid JSON format! '));
       return;
     }
     if (localInputs.base_url && localInputs.base_url.endsWith('/')) {
@@ -586,9 +586,9 @@ const EditChannel = (props) => {
     const { success, message } = res.data;
     if (success) {
       if (isEdit) {
-        showSuccess(t('渠道更新成功！'));
+        showSuccess(t('Channel updated successfully!'));
       } else {
-        showSuccess(t('渠道创建成功！'));
+        showSuccess(t('Channel created successfully!'));
         setInputs(originInputs);
       }
       props.refresh();
@@ -624,13 +624,13 @@ const EditChannel = (props) => {
 
     if (addedModels.length > 0) {
       showSuccess(
-        t('已新增 {{count}} 个模型：{{list}}', {
+        t('Added {{count}} models: {{list}}', {
           count: addedModels.length,
           list: addedModels.join(', '),
         })
       );
     } else {
-      showInfo(t('未发现新增模型'));
+      showInfo(t('No new models were added'));
     }
   };
 
@@ -645,8 +645,8 @@ const EditChannel = (props) => {
 
           if (!checked && vertexFileList.length > 1) {
             Modal.confirm({
-              title: t('切换为单密钥模式'),
-              content: t('将仅保留第一个密钥文件，其余文件将被移除，是否继续？'),
+              title: t('Switch to single key mode'),
+              content: t('Only the first key file will be retained, and the remaining files will be removed. Continue?'),
               onOk: () => {
                 const firstFile = vertexFileList[0];
                 const firstKey = vertexKeys[0] ? [vertexKeys[0]] : [];
@@ -1223,8 +1223,8 @@ const EditChannel = (props) => {
                       <IconCode size={16} />
                     </Avatar>
                     <div>
-                      <Text className="text-lg font-medium">{t('模型配置')}</Text>
-                      <div className="text-xs text-gray-600">{t('模型选择和映射设置')}</div>
+                      <Text className="text-lg font-medium">{t('Model Configuration')}</Text>
+                      <div className="text-xs text-gray-600">{t('Model selection and mapping settings')}</div>
                     </div>
                   </div>
 
@@ -1277,7 +1277,7 @@ const EditChannel = (props) => {
 
                   <Form.Input
                     field='custom_model'
-                    label={t('自定义模型名称')}
+                    label={t('Custom model name')}
                     placeholder={t('输入自定义模型名称')}
                     onChange={(value) => setCustomModel(value.trim())}
                     value={customModel}

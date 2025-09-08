@@ -272,7 +272,7 @@ const EditTagModal = (props) => {
         })
       );
     } else {
-      showInfo(t('未发现新增模型'));
+      showInfo(t('No new models were added'));
     }
   };
 
@@ -281,9 +281,9 @@ const EditTagModal = (props) => {
       placement='right'
       title={
         <Space>
-          <Tag color="blue" shape="circle">{t('编辑')}</Tag>
+          <Tag color="blue" shape="circle">{t('Edit')}</Tag>
           <Title heading={4} className="m-0">
-            {t('编辑标签')}
+            {t('Edit Tag')}
           </Title>
         </Space>
       }
@@ -331,22 +331,22 @@ const EditTagModal = (props) => {
                     <IconBookmark size={16} />
                   </Avatar>
                   <div>
-                    <Text className="text-lg font-medium">{t('标签信息')}</Text>
-                    <div className="text-xs text-gray-600">{t('标签的基本配置')}</div>
+                    <Text className="text-lg font-medium">{t('Tag Information')}</Text>
+                    <div className="text-xs text-gray-600">{t('Tag basic configuration')}</div>
                   </div>
                 </div>
 
                 <Banner
                   type="warning"
-                  description={t('所有编辑均为覆盖操作，留空则不更改')}
+                  description={t('All edits are overwrite operations, leaving blank will not change')}
                   className="!rounded-lg mb-4"
                 />
 
                 <div className="space-y-4">
                   <Form.Input
                     field='new_tag'
-                    label={t('标签名称')}
-                    placeholder={t('请输入新标签，留空则解散标签')}
+                    label={t('Tag Name')}
+                    placeholder={t('Please enter a new tag to parse the key file. Leaving it blank will dissolve the tag.')}
                     onChange={(value) => handleInputChange('new_tag', value)}
                   />
                 </div>
@@ -359,21 +359,21 @@ const EditTagModal = (props) => {
                     <IconCode size={16} />
                   </Avatar>
                   <div>
-                    <Text className="text-lg font-medium">{t('模型配置')}</Text>
-                    <div className="text-xs text-gray-600">{t('模型选择和映射设置')}</div>
+                    <Text className="text-lg font-medium">{t('Model Configuration')}</Text>
+                    <div className="text-xs text-gray-600">{t('Model selection and mapping settings')}</div>
                   </div>
                 </div>
 
                 <div className="space-y-4">
                   <Banner
                     type="info"
-                    description={t('当前模型列表为该标签下所有渠道模型列表最长的一个，并非所有渠道的并集，请注意可能导致某些渠道模型丢失。')}
+                    description={t('Current model list is the longest among all channels under this tag, not a union, may cause some channel models to be lost.')}
                     className="!rounded-lg mb-4"
                   />
                   <Form.Select
                     field='models'
-                    label={t('模型')}
-                    placeholder={t('请选择该渠道所支持的模型，留空则不更改')}
+                    label={t('Model')}
+                    placeholder={t('Please select the models supported by the channel, leaving blank will not change')}
                     multiple
                     filter
                     searchPosition='dropdown'
@@ -384,7 +384,7 @@ const EditTagModal = (props) => {
 
                   <Form.Input
                     field='custom_model'
-                    label={t('自定义模型名称')}
+                    label={t('Custom model name')}
                     placeholder={t('输入自定义模型名称')}
                     onChange={(value) => setCustomModel(value.trim())}
                     suffix={<Button size='small' type='primary' onClick={addCustomModels}>{t('填入')}</Button>}
@@ -392,15 +392,15 @@ const EditTagModal = (props) => {
 
                   <Form.TextArea
                     field='model_mapping'
-                    label={t('模型重定向')}
-                    placeholder={t('此项可选，用于修改请求体中的模型名称，为一个 JSON 字符串，键为请求中模型名称，值为要替换的模型名称，留空则不更改')}
+                    label={t('Model Mapping')}
+                    placeholder={t('This is optional, used to modify the model name in the request body, as a JSON string, the key is the model name in the request, the value is the model name to be replaced, leaving blank will not change')}
                     autosize
                     onChange={(value) => handleInputChange('model_mapping', value)}
                     extraText={(
                       <Space>
-                        <Text className="!text-semi-color-primary cursor-pointer" onClick={() => handleInputChange('model_mapping', JSON.stringify(MODEL_MAPPING_EXAMPLE, null, 2))}>{t('填入模板')}</Text>
-                        <Text className="!text-semi-color-primary cursor-pointer" onClick={() => handleInputChange('model_mapping', JSON.stringify({}, null, 2))}>{t('清空重定向')}</Text>
-                        <Text className="!text-semi-color-primary cursor-pointer" onClick={() => handleInputChange('model_mapping', '')}>{t('不更改')}</Text>
+                        <Text className="!text-semi-color-primary cursor-pointer" onClick={() => handleInputChange('model_mapping', JSON.stringify(MODEL_MAPPING_EXAMPLE, null, 2))}>{t('Fill Template')}</Text>
+                        <Text className="!text-semi-color-primary cursor-pointer" onClick={() => handleInputChange('model_mapping', JSON.stringify({}, null, 2))}>{t('Clear Mapping')}</Text>
+                        <Text className="!text-semi-color-primary cursor-pointer" onClick={() => handleInputChange('model_mapping', '')}>{t('Do not change')}</Text>
                       </Space>
                     )}
                   />
@@ -414,19 +414,19 @@ const EditTagModal = (props) => {
                     <IconUser size={16} />
                   </Avatar>
                   <div>
-                    <Text className="text-lg font-medium">{t('分组设置')}</Text>
-                    <div className="text-xs text-gray-600">{t('用户分组配置')}</div>
+                    <Text className="text-lg font-medium">{t('Group settings')}</Text>
+                    <div className="text-xs text-gray-600">{t('User group configuration')}</div>
                   </div>
                 </div>
 
                 <div className="space-y-4">
                   <Form.Select
                     field='groups'
-                    label={t('分组')}
-                    placeholder={t('请选择可以使用该渠道的分组，留空则不更改')}
+                    label={t('Groups')}
+                    placeholder={t('Please select the groups that can use this channel, leaving blank will not change')}
                     multiple
                     allowAdditions
-                    additionLabel={t('请在系统设置页面编辑分组倍率以添加新的分组：')}
+                    additionLabel={t('Edit group ratio in system settings to add new group:')}
                     optionList={groupOptions}
                     style={{ width: '100%' }}
                     onChange={(value) => handleInputChange('groups', value)}

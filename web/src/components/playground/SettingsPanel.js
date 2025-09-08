@@ -67,7 +67,7 @@ const SettingsPanel = ({
             <Settings size={20} className="text-white" />
           </div>
           <Typography.Title heading={5} className="mb-0">
-            {t('模型配置')}
+            {t('Model Configuration')}
           </Typography.Title>
         </div>
 

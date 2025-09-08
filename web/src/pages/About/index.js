@@ -39,8 +39,8 @@ const About = () => {
 
   const customDescription = (
     <div style={{ textAlign: 'center' }}>
-      <p>{t('可在设置页面设置关于内容，支持 HTML & Markdown')}</p>
-      {t('New API项目仓库地址：')}
+      <p>{t('You can set the content on the settings page, supporting HTML & Markdown')}</p>
+      {t('New API project repository address:')}
       <a
         href='https://github.com/QuantumNous/new-api'
         target="_blank"
@@ -64,7 +64,7 @@ const About = () => {
           className="!text-semi-color-primary"
         >
           QuantumNous
-        </a> {t('| 基于')} <a
+        </a> {t('| Based on')} <a
           href="https://github.com/songquanpeng/one-api/releases/tag/v0.5.4"
           target="_blank"
           rel="noopener noreferrer"
@@ -81,16 +81,16 @@ const About = () => {
         </a>
       </p>
       <p>
-        {t('本项目根据')}
+        {t('This project is licensed under the ')}
         <a
           href="https://github.com/songquanpeng/one-api/blob/v0.5.4/LICENSE"
           target="_blank"
           rel="noopener noreferrer"
           className="!text-semi-color-primary"
         >
-          {t('MIT许可证')}
+          {t('MIT License')}
         </a>
-        {t('授权，需在遵守')}
+        {t(' and must be used in compliance with the ')}
         <a
           href="https://github.com/QuantumNous/new-api/blob/main/LICENSE"
           target="_blank"
@@ -99,7 +99,7 @@ const About = () => {
         >
           {t('Apache-2.0协议')}
         </a>
-        {t('的前提下使用。')}
+        {t('used under the premise.')}
       </p>
     </div>
   );
@@ -111,7 +111,7 @@ const About = () => {
           <Empty
             image={<IllustrationConstruction style={{ width: 150, height: 150 }} />}
             darkModeImage={<IllustrationConstructionDark style={{ width: 150, height: 150 }} />}
-            description={t('管理员暂时未设置任何关于内容')}
+            description={t('The administrator has not set any custom About content yet')}
             style={emptyStyle}
           >
             {customDescription}
