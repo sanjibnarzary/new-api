@@ -76,13 +76,19 @@ const SettingsPanel = ({
 <<<<<<< HEAD:web/src/components/playground/SettingsPanel.js
           <Typography.Title heading={5} className="mb-0">
             {t('Model Configuration')}
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream:web/src/components/playground/SettingsPanel.js
 =======
+=======
+>>>>>>> Stashed changes
 =======
           <Typography.Title heading={5} className='mb-0'>
             {t('模型配置')}
 >>>>>>> 93adcd57d7d851d90ee051e1daf8db7ea6b52655:web/src/components/playground/SettingsPanel.jsx
+<<<<<<< Updated upstream
 >>>>>>> Stashed changes:web/src/components/playground/SettingsPanel.jsx
+=======
+>>>>>>> Stashed changes
           </Typography.Title>
         </div>
 

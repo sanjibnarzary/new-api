@@ -301,23 +301,33 @@ const EditTagModal = (props) => {
       placement='right'
       title={
         <Space>
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream:web/src/pages/Channel/EditTagModal.js
+=======
+<<<<<<< HEAD:web/src/pages/Channel/EditTagModal.js
+>>>>>>> Stashed changes
           <Tag color="blue" shape="circle">{t('Edit')}</Tag>
           <Title heading={4} className="m-0">
             {t('Edit Tag')}
 =======
+<<<<<<< Updated upstream
 <<<<<<< HEAD:web/src/pages/Channel/EditTagModal.js
           <Tag color="blue" shape="circle">{t('Edit')}</Tag>
           <Title heading={4} className="m-0">
             {t('Edit Tag')}
 =======
+=======
+>>>>>>> Stashed changes
           <Tag color='blue' shape='circle'>
             {t('编辑')}
           </Tag>
           <Title heading={4} className='m-0'>
             {t('编辑标签')}
 >>>>>>> 93adcd57d7d851d90ee051e1daf8db7ea6b52655:web/src/components/table/channels/modals/EditTagModal.jsx
+<<<<<<< Updated upstream
 >>>>>>> Stashed changes:web/src/components/table/channels/modals/EditTagModal.jsx
+=======
+>>>>>>> Stashed changes
           </Title>
         </Space>
       }
@@ -365,10 +375,13 @@ const EditTagModal = (props) => {
                     <IconBookmark size={16} />
                   </Avatar>
                   <div>
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream:web/src/pages/Channel/EditTagModal.js
                     <Text className="text-lg font-medium">{t('Tag Information')}</Text>
                     <div className="text-xs text-gray-600">{t('Tag basic configuration')}</div>
 =======
+=======
+>>>>>>> Stashed changes
 <<<<<<< HEAD:web/src/pages/Channel/EditTagModal.js
                     <Text className="text-lg font-medium">{t('Tag Information')}</Text>
                     <div className="text-xs text-gray-600">{t('Tag basic configuration')}</div>
@@ -378,7 +391,10 @@ const EditTagModal = (props) => {
                       {t('标签的基本配置')}
                     </div>
 >>>>>>> 93adcd57d7d851d90ee051e1daf8db7ea6b52655:web/src/components/table/channels/modals/EditTagModal.jsx
+<<<<<<< Updated upstream
 >>>>>>> Stashed changes:web/src/components/table/channels/modals/EditTagModal.jsx
+=======
+>>>>>>> Stashed changes
                   </div>
                 </div>
 
@@ -415,10 +431,13 @@ const EditTagModal = (props) => {
                     <IconCode size={16} />
                   </Avatar>
                   <div>
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream:web/src/pages/Channel/EditTagModal.js
                     <Text className="text-lg font-medium">{t('Model Configuration')}</Text>
                     <div className="text-xs text-gray-600">{t('Model selection and mapping settings')}</div>
 =======
+=======
+>>>>>>> Stashed changes
 <<<<<<< HEAD:web/src/pages/Channel/EditTagModal.js
                     <Text className="text-lg font-medium">{t('Model Configuration')}</Text>
                     <div className="text-xs text-gray-600">{t('Model selection and mapping settings')}</div>
@@ -428,7 +447,10 @@ const EditTagModal = (props) => {
                       {t('模型选择和映射设置')}
                     </div>
 >>>>>>> 93adcd57d7d851d90ee051e1daf8db7ea6b52655:web/src/components/table/channels/modals/EditTagModal.jsx
+<<<<<<< Updated upstream
 >>>>>>> Stashed changes:web/src/components/table/channels/modals/EditTagModal.jsx
+=======
+>>>>>>> Stashed changes
                   </div>
                 </div>
 
@@ -477,10 +499,14 @@ const EditTagModal = (props) => {
 
                   <Form.TextArea
                     field='model_mapping'
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream:web/src/pages/Channel/EditTagModal.js
 =======
 <<<<<<< HEAD:web/src/pages/Channel/EditTagModal.js
 >>>>>>> Stashed changes:web/src/components/table/channels/modals/EditTagModal.jsx
+=======
+<<<<<<< HEAD:web/src/pages/Channel/EditTagModal.js
+>>>>>>> Stashed changes
                     label={t('Model Mapping')}
                     placeholder={t('This is optional, used to modify the model name in the request body, as a JSON string, the key is the model name in the request, the value is the model name to be replaced, leaving blank will not change')}
                     autosize
@@ -544,10 +570,13 @@ const EditTagModal = (props) => {
                     <IconUser size={16} />
                   </Avatar>
                   <div>
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream:web/src/pages/Channel/EditTagModal.js
                     <Text className="text-lg font-medium">{t('Group settings')}</Text>
                     <div className="text-xs text-gray-600">{t('User group configuration')}</div>
 =======
+=======
+>>>>>>> Stashed changes
 <<<<<<< HEAD:web/src/pages/Channel/EditTagModal.js
                     <Text className="text-lg font-medium">{t('Group settings')}</Text>
                     <div className="text-xs text-gray-600">{t('User group configuration')}</div>
@@ -557,7 +586,10 @@ const EditTagModal = (props) => {
                       {t('用户分组配置')}
                     </div>
 >>>>>>> 93adcd57d7d851d90ee051e1daf8db7ea6b52655:web/src/components/table/channels/modals/EditTagModal.jsx
+<<<<<<< Updated upstream
 >>>>>>> Stashed changes:web/src/components/table/channels/modals/EditTagModal.jsx
+=======
+>>>>>>> Stashed changes
                   </div>
                 </div>
 
@@ -568,9 +600,12 @@ const EditTagModal = (props) => {
                     placeholder={t('Please select the groups that can use this channel, leaving blank will not change')}
                     multiple
                     allowAdditions
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream:web/src/pages/Channel/EditTagModal.js
                     additionLabel={t('Edit group ratio in system settings to add new group:')}
 =======
+=======
+>>>>>>> Stashed changes
 <<<<<<< HEAD:web/src/pages/Channel/EditTagModal.js
                     additionLabel={t('Edit group ratio in system settings to add new group:')}
 =======
@@ -578,7 +613,10 @@ const EditTagModal = (props) => {
                       '请在系统设置页面编辑分组倍率以添加新的分组：',
                     )}
 >>>>>>> 93adcd57d7d851d90ee051e1daf8db7ea6b52655:web/src/components/table/channels/modals/EditTagModal.jsx
+<<<<<<< Updated upstream
 >>>>>>> Stashed changes:web/src/components/table/channels/modals/EditTagModal.jsx
+=======
+>>>>>>> Stashed changes
                     optionList={groupOptions}
                     style={{ width: '100%' }}
                     onChange={(value) => handleInputChange('groups', value)}
