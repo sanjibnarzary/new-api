@@ -101,7 +101,7 @@ func Distribute() func(c *gin.Context) {
 					if userGroup == "auto" {
 						showGroup = fmt.Sprintf("auto(%s)", selectGroup)
 					}
-					message := fmt.Sprintf("Failed to get available channels for model %s under group %s (database consistency has been violated, distributor): %s", showGroup, modelRequest.Model, err.Error())
+					message := fmt.Sprintf("failed to get available channels for model %s under group %s (database consistency has been violated, distributor): %s", showGroup, modelRequest.Model, err.Error())
 					// 如果错误，但是渠道不为空，说明是数据库一致性问题
 					//if channel != nil {
 					//	common.SysError(fmt.Sprintf("渠道不存在：%d", channel.Id))
@@ -145,7 +145,7 @@ func getModelRequest(c *gin.Context) (*ModelRequest, bool, error) {
 			}
 			if midjourneyModel == "" {
 				if !success {
-					return nil, false, fmt.Errorf("Invalid request, unable to parse model")
+					return nil, false, fmt.Errorf("invalid request, unable to parse model")
 				} else {
 					// task fetch, task fetch by condition, notify
 					shouldSelectChannel = false

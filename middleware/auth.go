@@ -243,7 +243,7 @@ func TokenAuth() func(c *gin.Context) {
 		if len(allowIpsMap) != 0 {
 			clientIp := c.ClientIP()
 			if _, ok := allowIpsMap[clientIp]; !ok {
-				abortWithOpenAiMessage(c, http.StatusForbidden, "您的 IP 不在令牌允许访问的列表中")
+				abortWithOpenAiMessage(c, http.StatusForbidden, "Your IP is not in the list of allowed access by the token")
 				return
 			}
 		}
@@ -255,7 +255,7 @@ func TokenAuth() func(c *gin.Context) {
 		}
 		userEnabled := userCache.Status == common.UserStatusEnabled
 		if !userEnabled {
-			abortWithOpenAiMessage(c, http.StatusForbidden, "用户已被封禁")
+			abortWithOpenAiMessage(c, http.StatusForbidden, "User has been banned")
 			return
 		}
 
@@ -266,13 +266,13 @@ func TokenAuth() func(c *gin.Context) {
 		if tokenGroup != "" {
 			// check common.UserUsableGroups[userGroup]
 			if _, ok := setting.GetUserUsableGroups(userGroup)[tokenGroup]; !ok {
-				abortWithOpenAiMessage(c, http.StatusForbidden, fmt.Sprintf("令牌分组 %s 已被禁用", tokenGroup))
+				abortWithOpenAiMessage(c, http.StatusForbidden, fmt.Sprintf("Token group %s has been disabled", tokenGroup))
 				return
 			}
 			// check group in common.GroupRatio
 			if !ratio_setting.ContainsGroupRatio(tokenGroup) {
 				if tokenGroup != "auto" {
-					abortWithOpenAiMessage(c, http.StatusForbidden, fmt.Sprintf("分组 %s 已被弃用", tokenGroup))
+					abortWithOpenAiMessage(c, http.StatusForbidden, fmt.Sprintf("Group %s is deprecated", tokenGroup))
 					return
 				}
 			}
@@ -311,8 +311,8 @@ func SetupContextForToken(c *gin.Context, token *model.Token, parts ...string) e
 		if model.IsAdmin(token.UserId) {
 			c.Set("specific_channel_id", parts[1])
 		} else {
-			abortWithOpenAiMessage(c, http.StatusForbidden, "普通用户不支持指定渠道")
-			return fmt.Errorf("Ordinary users do not support designated channels")
+			abortWithOpenAiMessage(c, http.StatusForbidden, "Ordinary users do not support designated channels")
+			return fmt.Errorf("ordinary users do not support designated channels")
 		}
 	}
 	return nil

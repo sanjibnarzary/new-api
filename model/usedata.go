@@ -2,10 +2,11 @@ package model
 
 import (
 	"fmt"
-	"gorm.io/gorm"
 	"one-api/common"
 	"sync"
 	"time"
+
+	"gorm.io/gorm"
 )
 
 // QuotaData 柱状图数据
@@ -23,7 +24,7 @@ type QuotaData struct {
 func UpdateQuotaData() {
 	for {
 		if common.DataExportEnabled {
-			common.SysLog("正在更新数据看板数据...")
+			common.SysLog("updating dashboard data...")
 			SaveQuotaDataCache()
 		}
 		time.Sleep(time.Duration(common.DataExportInterval) * time.Minute)
@@ -85,7 +86,7 @@ func SaveQuotaDataCache() {
 		}
 	}
 	CacheQuotaData = make(map[string]*QuotaData)
-	common.SysLog(fmt.Sprintf("保存数据看板数据成功，共保存%d条数据", size))
+	common.SysLog(fmt.Sprintf("the data dashboard data was saved successfully, and a total of %d data items were saved.", size))
 }
 
 func increaseQuotaData(userId int, username string, modelName string, count int, quota int, createdAt int64, tokenUsed int) {
