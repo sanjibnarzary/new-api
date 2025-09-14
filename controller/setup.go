@@ -1,12 +1,13 @@
 package controller
 
 import (
-	"github.com/gin-gonic/gin"
 	"one-api/common"
 	"one-api/constant"
 	"one-api/model"
 	"one-api/setting/operation_setting"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 type Setup struct {
@@ -55,7 +56,7 @@ func PostSetup(c *gin.Context) {
 	if constant.Setup {
 		c.JSON(400, gin.H{
 			"success": false,
-			"message": "系统已经初始化完成",
+			"message": "The system has been initialized",
 		})
 		return
 	}
@@ -68,7 +69,7 @@ func PostSetup(c *gin.Context) {
 	if err != nil {
 		c.JSON(400, gin.H{
 			"success": false,
-			"message": "请求参数有误",
+			"message": "The request parameters are incorrect",
 		})
 		return
 	}
@@ -79,7 +80,7 @@ func PostSetup(c *gin.Context) {
 		if len(req.Username) > 12 {
 			c.JSON(400, gin.H{
 				"success": false,
-				"message": "用户名长度不能超过12个字符",
+				"message": "Username cannot exceed 12 characters",
 			})
 			return
 		}
@@ -87,7 +88,7 @@ func PostSetup(c *gin.Context) {
 		if req.Password != req.ConfirmPassword {
 			c.JSON(400, gin.H{
 				"success": false,
-				"message": "两次输入的密码不一致",
+				"message": "The passwords entered twice do not match",
 			})
 			return
 		}
@@ -95,7 +96,7 @@ func PostSetup(c *gin.Context) {
 		if len(req.Password) < 8 {
 			c.JSON(400, gin.H{
 				"success": false,
-				"message": "密码长度至少为8个字符",
+				"message": "Password must be at least 8 characters long",
 			})
 			return
 		}
@@ -105,7 +106,7 @@ func PostSetup(c *gin.Context) {
 		if err != nil {
 			c.JSON(500, gin.H{
 				"success": false,
-				"message": "系统错误: " + err.Error(),
+				"message": "System Error: " + err.Error(),
 			})
 			return
 		}
@@ -122,7 +123,7 @@ func PostSetup(c *gin.Context) {
 		if err != nil {
 			c.JSON(500, gin.H{
 				"success": false,
-				"message": "创建管理员账号失败: " + err.Error(),
+				"message": "Failed to create administrator account: " + err.Error(),
 			})
 			return
 		}
@@ -137,7 +138,7 @@ func PostSetup(c *gin.Context) {
 	if err != nil {
 		c.JSON(500, gin.H{
 			"success": false,
-			"message": "保存自用模式设置失败: " + err.Error(),
+			"message": "Failed to save the private mode settings: " + err.Error(),
 		})
 		return
 	}
@@ -146,7 +147,7 @@ func PostSetup(c *gin.Context) {
 	if err != nil {
 		c.JSON(500, gin.H{
 			"success": false,
-			"message": "保存演示站点模式设置失败: " + err.Error(),
+			"message": "Failed to save demo site mode settings: " + err.Error(),
 		})
 		return
 	}
@@ -162,14 +163,14 @@ func PostSetup(c *gin.Context) {
 	if err != nil {
 		c.JSON(500, gin.H{
 			"success": false,
-			"message": "系统初始化失败: " + err.Error(),
+			"message": "System initialization failed: " + err.Error(),
 		})
 		return
 	}
 
 	c.JSON(200, gin.H{
 		"success": true,
-		"message": "系统初始化成功",
+		"message": "System initialization successful",
 	})
 }
 

@@ -187,7 +187,7 @@ func Relay(c *gin.Context, relayFormat types.RelayFormat) {
 
 	useChannel := c.GetStringSlice("use_channel")
 	if len(useChannel) > 1 {
-		retryLogStr := fmt.Sprintf("重试：%s", strings.Trim(strings.Join(strings.Fields(fmt.Sprint(useChannel)), "->"), "[]"))
+		retryLogStr := fmt.Sprintf("Retry: %s", strings.Trim(strings.Join(strings.Fields(fmt.Sprint(useChannel)), "->"), "[]"))
 		logger.LogInfo(c, retryLogStr)
 	}
 }
@@ -221,10 +221,10 @@ func getChannel(c *gin.Context, group, originalModel string, retryCount int) (*m
 	}
 	channel, selectGroup, err := model.CacheGetRandomSatisfiedChannel(c, group, originalModel, retryCount)
 	if err != nil {
-		return nil, types.NewError(fmt.Errorf("获取分组 %s 下模型 %s 的可用渠道失败（retry）: %s", selectGroup, originalModel, err.Error()), types.ErrorCodeGetChannelFailed, types.ErrOptionWithSkipRetry())
+		return nil, types.NewError(fmt.Errorf("Failed to get available channels for model %s under group %s (retry): %s", selectGroup, originalModel, err.Error()), types.ErrorCodeGetChannelFailed, types.ErrOptionWithSkipRetry())
 	}
 	if channel == nil {
-		return nil, types.NewError(fmt.Errorf("分组 %s 下模型 %s 的可用渠道不存在（数据库一致性已被破坏，retry）", selectGroup, originalModel), types.ErrorCodeGetChannelFailed, types.ErrOptionWithSkipRetry())
+		return nil, types.NewError(fmt.Errorf("The available channel for model %s under group %s does not exist (database consistency has been destroyed, retry) ", selectGroup, originalModel), types.ErrorCodeGetChannelFailed, types.ErrOptionWithSkipRetry())
 	}
 	newAPIError := middleware.SetupContextForSelectedChannel(c, channel, originalModel)
 	if newAPIError != nil {
@@ -343,7 +343,7 @@ func RelayMidjourney(c *gin.Context) {
 	if mjErr != nil {
 		statusCode := http.StatusBadRequest
 		if mjErr.Code == 30 {
-			mjErr.Result = "当前分组负载已饱和，请稍后再试，或升级账户以提升服务质量。"
+			mjErr.Result = "The current group load is saturated. Please try again later or upgrade your account to improve service quality."
 			statusCode = http.StatusTooManyRequests
 		}
 		c.JSON(statusCode, gin.H{
@@ -414,12 +414,12 @@ func RelayTask(c *gin.Context) {
 	}
 	useChannel := c.GetStringSlice("use_channel")
 	if len(useChannel) > 1 {
-		retryLogStr := fmt.Sprintf("重试：%s", strings.Trim(strings.Join(strings.Fields(fmt.Sprint(useChannel)), "->"), "[]"))
+		retryLogStr := fmt.Sprintf("Retry: %s", strings.Trim(strings.Join(strings.Fields(fmt.Sprint(useChannel)), "->"), "[]"))
 		logger.LogInfo(c, retryLogStr)
 	}
 	if taskErr != nil {
 		if taskErr.StatusCode == http.StatusTooManyRequests {
-			taskErr.Message = "当前分组上游负载已饱和，请稍后再试"
+			taskErr.Message = "The current upstream load of the group is saturated. Please try again later."
 		}
 		c.JSON(taskErr.StatusCode, taskErr)
 	}

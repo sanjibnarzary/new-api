@@ -144,7 +144,7 @@ func AddToken(c *gin.Context) {
 	if len(token.Name) > 30 {
 		c.JSON(http.StatusOK, gin.H{
 			"success": false,
-			"message": "令牌名称过长",
+			"message": "Token name is too long",
 		})
 		return
 	}
@@ -152,7 +152,7 @@ func AddToken(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"success": false,
-			"message": "生成令牌失败",
+			"message": "Failed to generate token",
 		})
 		common.SysLog("failed to generate token key: " + err.Error())
 		return
@@ -210,7 +210,7 @@ func UpdateToken(c *gin.Context) {
 	if len(token.Name) > 30 {
 		c.JSON(http.StatusOK, gin.H{
 			"success": false,
-			"message": "令牌名称过长",
+			"message": "Token name is too long",
 		})
 		return
 	}
@@ -223,14 +223,14 @@ func UpdateToken(c *gin.Context) {
 		if cleanToken.Status == common.TokenStatusExpired && cleanToken.ExpiredTime <= common.GetTimestamp() && cleanToken.ExpiredTime != -1 {
 			c.JSON(http.StatusOK, gin.H{
 				"success": false,
-				"message": "令牌已过期，无法启用，请先修改令牌过期时间，或者设置为永不过期",
+				"message": "The token has expired and cannot be activated. Please modify the token expiration time first, or set it to never expire.",
 			})
 			return
 		}
 		if cleanToken.Status == common.TokenStatusExhausted && cleanToken.RemainQuota <= 0 && !cleanToken.UnlimitedQuota {
 			c.JSON(http.StatusOK, gin.H{
 				"success": false,
-				"message": "令牌可用额度已用尽，无法启用，请先修改令牌剩余额度，或者设置为无限额度",
+				"message": "The available token amount has been used up and cannot be activated. Please modify the remaining token amount first, or set it to unlimited amount.",
 			})
 			return
 		}
@@ -270,7 +270,7 @@ func DeleteTokenBatch(c *gin.Context) {
 	if err := c.ShouldBindJSON(&tokenBatch); err != nil || len(tokenBatch.Ids) == 0 {
 		c.JSON(http.StatusOK, gin.H{
 			"success": false,
-			"message": "参数错误",
+			"message": "Parameter error",
 		})
 		return
 	}
