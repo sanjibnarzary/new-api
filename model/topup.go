@@ -54,7 +54,7 @@ func GetTopUpByTradeNo(tradeNo string) *TopUp {
 
 func Recharge(referenceId string, customerId string) (err error) {
 	if referenceId == "" {
-		return errors.New("未提供支付单号")
+		return errors.New("no payment order number provided")
 	}
 
 	var quota float64
@@ -68,11 +68,11 @@ func Recharge(referenceId string, customerId string) (err error) {
 	err = DB.Transaction(func(tx *gorm.DB) error {
 		err := tx.Set("gorm:query_option", "FOR UPDATE").Where(refCol+" = ?", referenceId).First(topUp).Error
 		if err != nil {
-			return errors.New("充值订单不存在")
+			return errors.New("the recharge order does not exist")
 		}
 
 		if topUp.Status != common.TopUpStatusPending {
-			return errors.New("充值订单状态错误")
+			return errors.New("recharge order status error")
 		}
 
 		topUp.CompleteTime = common.GetTimestamp()
@@ -92,10 +92,10 @@ func Recharge(referenceId string, customerId string) (err error) {
 	})
 
 	if err != nil {
-		return errors.New("充值失败，" + err.Error())
+		return errors.New("recharge failed. " + err.Error())
 	}
 
-	RecordLog(topUp.UserId, LogTypeTopup, fmt.Sprintf("使用在线充值成功，充值金额: %v，支付金额：%d", logger.FormatQuota(int(quota)), topUp.Amount))
+	RecordLog(topUp.UserId, LogTypeTopup, fmt.Sprintf("use online recharge successfully, recharge amount: %v，支付金额：%d", logger.FormatQuota(int(quota)), topUp.Amount))
 
 	return nil
 }
