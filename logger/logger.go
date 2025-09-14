@@ -93,9 +93,9 @@ func logHelper(ctx context.Context, level string, msg string) {
 
 func LogQuota(quota int) string {
 	if common.DisplayInCurrencyEnabled {
-		return fmt.Sprintf("＄%.6f 额度", float64(quota)/common.QuotaPerUnit)
+		return fmt.Sprintf("＄%.6f Credit limit", float64(quota)/common.QuotaPerUnit)
 	} else {
-		return fmt.Sprintf("%d 点额度", quota)
+		return fmt.Sprintf("%d Point amount", quota)
 	}
 }
 

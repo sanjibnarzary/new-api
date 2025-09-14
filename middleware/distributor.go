@@ -37,16 +37,16 @@ func Distribute() func(c *gin.Context) {
 		if ok {
 			id, err := strconv.Atoi(channelId.(string))
 			if err != nil {
-				abortWithOpenAiMessage(c, http.StatusBadRequest, "无效的渠道 Id")
+				abortWithOpenAiMessage(c, http.StatusBadRequest, "Invalid channel Id")
 				return
 			}
 			channel, err = model.GetChannelById(id, true)
 			if err != nil {
-				abortWithOpenAiMessage(c, http.StatusBadRequest, "无效的渠道 Id")
+				abortWithOpenAiMessage(c, http.StatusBadRequest, "Invalid channel Id")
 				return
 			}
 			if channel.Status != common.ChannelStatusEnabled {
-				abortWithOpenAiMessage(c, http.StatusForbidden, "该渠道已被禁用")
+				abortWithOpenAiMessage(c, http.StatusForbidden, "This channel has been disabled")
 				return
 			}
 		} else {
@@ -57,7 +57,7 @@ func Distribute() func(c *gin.Context) {
 				s, ok := common.GetContextKey(c, constant.ContextKeyTokenModelLimit)
 				if !ok {
 					// token model limit is empty, all models are not allowed
-					abortWithOpenAiMessage(c, http.StatusForbidden, "该令牌无权访问任何模型")
+					abortWithOpenAiMessage(c, http.StatusForbidden, "This token does not have permission to access any models")
 					return
 				}
 				var tokenModelLimit map[string]bool
@@ -67,14 +67,14 @@ func Distribute() func(c *gin.Context) {
 				}
 				matchName := ratio_setting.FormatMatchingModelName(modelRequest.Model) // match gpts & thinking-*
 				if _, ok := tokenModelLimit[matchName]; !ok {
-					abortWithOpenAiMessage(c, http.StatusForbidden, "该令牌无权访问模型 "+modelRequest.Model)
+					abortWithOpenAiMessage(c, http.StatusForbidden, "The token does not have permission to access the model "+modelRequest.Model)
 					return
 				}
 			}
 
 			if shouldSelectChannel {
 				if modelRequest.Model == "" {
-					abortWithOpenAiMessage(c, http.StatusBadRequest, "未指定模型名称，模型名称不能为空")
+					abortWithOpenAiMessage(c, http.StatusBadRequest, "The model name is not specified. The model name cannot be empty.")
 					return
 				}
 				var selectGroup string
@@ -84,12 +84,12 @@ func Distribute() func(c *gin.Context) {
 					playgroundRequest := &dto.PlayGroundRequest{}
 					err = common.UnmarshalBodyReusable(c, playgroundRequest)
 					if err != nil {
-						abortWithOpenAiMessage(c, http.StatusBadRequest, "无效的请求, "+err.Error())
+						abortWithOpenAiMessage(c, http.StatusBadRequest, "Invalid request, "+err.Error())
 						return
 					}
 					if playgroundRequest.Group != "" {
 						if !setting.GroupInUserUsableGroups(playgroundRequest.Group) && playgroundRequest.Group != userGroup {
-							abortWithOpenAiMessage(c, http.StatusForbidden, "无权访问该分组")
+							abortWithOpenAiMessage(c, http.StatusForbidden, "No access to this group")
 							return
 						}
 						userGroup = playgroundRequest.Group
@@ -101,7 +101,7 @@ func Distribute() func(c *gin.Context) {
 					if userGroup == "auto" {
 						showGroup = fmt.Sprintf("auto(%s)", selectGroup)
 					}
-					message := fmt.Sprintf("获取分组 %s 下模型 %s 的可用渠道失败（数据库一致性已被破坏，distributor）: %s", showGroup, modelRequest.Model, err.Error())
+					message := fmt.Sprintf("Failed to get available channels for model %s under group %s (database consistency has been violated, distributor): %s", showGroup, modelRequest.Model, err.Error())
 					// 如果错误，但是渠道不为空，说明是数据库一致性问题
 					//if channel != nil {
 					//	common.SysError(fmt.Sprintf("渠道不存在：%d", channel.Id))
@@ -111,7 +111,7 @@ func Distribute() func(c *gin.Context) {
 					return
 				}
 				if channel == nil {
-					abortWithOpenAiMessage(c, http.StatusServiceUnavailable, fmt.Sprintf("分组 %s 下模型 %s 无可用渠道（distributor）", userGroup, modelRequest.Model), string(types.ErrorCodeModelNotFound))
+					abortWithOpenAiMessage(c, http.StatusServiceUnavailable, fmt.Sprintf("No channel (distributor) available for model %s in group %s ", userGroup, modelRequest.Model), string(types.ErrorCodeModelNotFound))
 					return
 				}
 			}
@@ -145,7 +145,7 @@ func getModelRequest(c *gin.Context) (*ModelRequest, bool, error) {
 			}
 			if midjourneyModel == "" {
 				if !success {
-					return nil, false, fmt.Errorf("无效的请求, 无法解析模型")
+					return nil, false, fmt.Errorf("Invalid request, unable to parse model")
 				} else {
 					// task fetch, task fetch by condition, notify
 					shouldSelectChannel = false
@@ -189,7 +189,7 @@ func getModelRequest(c *gin.Context) (*ModelRequest, bool, error) {
 		err = common.UnmarshalBodyReusable(c, &modelRequest)
 	}
 	if err != nil {
-		return nil, false, errors.New("无效的请求, " + err.Error())
+		return nil, false, errors.New("Invalid request, " + err.Error())
 	}
 	if strings.HasPrefix(c.Request.URL.Path, "/v1/realtime") {
 		//wss://api.openai.com/v1/realtime?model=gpt-4o-realtime-preview-2024-10-01
@@ -232,7 +232,7 @@ func getModelRequest(c *gin.Context) (*ModelRequest, bool, error) {
 		// playground chat completions
 		err = common.UnmarshalBodyReusable(c, &modelRequest)
 		if err != nil {
-			return nil, false, errors.New("无效的请求, " + err.Error())
+			return nil, false, errors.New("Invalid request, " + err.Error())
 		}
 		common.SetContextKey(c, constant.ContextKeyTokenGroup, modelRequest.Group)
 	}

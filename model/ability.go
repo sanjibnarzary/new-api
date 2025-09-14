@@ -286,7 +286,7 @@ var fixLock = sync.Mutex{}
 func FixAbility() (int, int, error) {
 	lock := fixLock.TryLock()
 	if !lock {
-		return 0, 0, errors.New("已经有一个修复任务在运行中，请稍后再试")
+		return 0, 0, errors.New("There is already a repair task running, please try again later")
 	}
 	defer fixLock.Unlock()
 
