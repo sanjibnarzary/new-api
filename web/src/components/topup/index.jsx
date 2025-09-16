@@ -186,10 +186,20 @@ const TopUp = () => {
     try {
       let res;
       if (payWay === 'stripe') {
-        // Stripe 支付请求
+    // Stripe 支付请求
+    console.log('Stripe payment full name:', userState.user.full_name);
         res = await API.post('/api/user/stripe/pay', {
           amount: parseInt(topUpCount),
           payment_method: 'stripe',
+          name: userState.user.full_name,
+          address: {
+            line1: userState.user.address_line1,
+            postal_code: userState.user.address_postal_code,
+            city: userState.user.address_city,
+            state: userState.user.address_state,
+            country_code: userState.user.country_code,
+          },
+          phone: userState.user.phone
         });
       } else {
         // 普通支付请求

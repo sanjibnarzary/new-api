@@ -165,14 +165,26 @@ const LoginForm = () => {
             return;
           }
 
-          userDispatch({ type: 'login', payload: data });
-          setUserData(data);
+          // Ensure profile fields are set in state and localStorage
+          const userData = {
+            ...data,
+            full_name: data.full_name || '',
+            address_line1: data.address_line1 || '',
+            address_postal_code: data.address_postal_code || '',
+            address_city: data.address_city || '',
+            address_state: data.address_state || '',
+            country_code: data.country_code || '',
+            phone: data.phone || '',
+          };
+          userDispatch({ type: 'login', payload: userData });
+          setUserData(userData);
+          localStorage.setItem('user', JSON.stringify(userData));
           updateAPI();
-          showSuccess('登录成功！');
+          showSuccess('Login successful!');
           if (username === 'root' && password === '123456') {
             Modal.error({
-              title: '您正在使用默认密码！',
-              content: '请立刻修改默认密码！',
+              title: 'You are using the default password!',
+              content: 'Please change your default password immediately!',
               centered: true,
             });
           }

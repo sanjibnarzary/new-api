@@ -21,6 +21,13 @@ type UserBase struct {
 	Status   int    `json:"status"`
 	Username string `json:"username"`
 	Setting  string `json:"setting"`
+	FullName   string `json:"full_name"`
+	AddressLine1 string `json:"address_line1"`
+	AddressPostalCode string `json:"address_postal_code"`
+	AddressCity string `json:"address_city"`
+	AddressState string `json:"address_state"`
+	AddressCountry string `json:"address_country"`
+	Phone      string `json:"phone"`
 }
 
 func (user *UserBase) WriteContext(c *gin.Context) {
@@ -30,6 +37,13 @@ func (user *UserBase) WriteContext(c *gin.Context) {
 	common.SetContextKey(c, constant.ContextKeyUserEmail, user.Email)
 	common.SetContextKey(c, constant.ContextKeyUserName, user.Username)
 	common.SetContextKey(c, constant.ContextKeyUserSetting, user.GetSetting())
+		common.SetContextKey(c, constant.ContextKeyUserFullName, user.FullName)
+		common.SetContextKey(c, constant.ContextKeyUserAddressLine1, user.AddressLine1)
+		common.SetContextKey(c, constant.ContextKeyUserAddressPostalCode, user.AddressPostalCode)
+		common.SetContextKey(c, constant.ContextKeyUserAddressCity, user.AddressCity)
+		common.SetContextKey(c, constant.ContextKeyUserAddressState, user.AddressState)
+		common.SetContextKey(c, constant.ContextKeyUserAddressCountry, user.AddressCountry)
+		common.SetContextKey(c, constant.ContextKeyUserPhone, user.Phone)
 }
 
 func (user *UserBase) GetSetting() dto.UserSetting {
@@ -98,15 +112,22 @@ func GetUserCache(userId int) (userCache *UserBase, err error) {
 	}
 
 	// Create cache object from user data
-	userCache = &UserBase{
-		Id:       user.Id,
-		Group:    user.Group,
-		Quota:    user.Quota,
-		Status:   user.Status,
-		Username: user.Username,
-		Setting:  user.Setting,
-		Email:    user.Email,
-	}
+	   userCache = &UserBase{
+		   Id:       user.Id,
+		   Group:    user.Group,
+		   Quota:    user.Quota,
+		   Status:   user.Status,
+		   Username: user.Username,
+		   Setting:  user.Setting,
+		   Email:    user.Email,
+		   FullName: user.FullName,
+		   AddressLine1: user.AddressLine1,
+		   AddressPostalCode: user.AddressPostalCode,
+		   AddressCity: user.AddressCity,
+		   AddressState: user.AddressState,
+		   AddressCountry: user.AddressCountry,
+		   Phone:    user.Phone,
+	   }
 
 	return userCache, nil
 }
@@ -168,6 +189,7 @@ func getUserNameCache(userId int) (string, error) {
 	}
 	return cache.Username, nil
 }
+
 
 func getUserSettingCache(userId int) (dto.UserSetting, error) {
 	cache, err := GetUserCache(userId)
