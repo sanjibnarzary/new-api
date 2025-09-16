@@ -46,5 +46,13 @@ const (
 	ContextKeyUsingGroup  ContextKey = "group"
 	ContextKeyUserName    ContextKey = "username"
 
+	ContextKeyUserFullName        ContextKey = "user_full_name"
+	ContextKeyUserAddressLine1    ContextKey = "user_address_line1"
+	ContextKeyUserAddressPostalCode ContextKey = "user_address_postal_code"
+	ContextKeyUserAddressCity     ContextKey = "user_address_city"
+	ContextKeyUserAddressState    ContextKey = "user_address_state"
+	ContextKeyUserAddressCountry  ContextKey = "user_address_country"
+	ContextKeyUserPhone           ContextKey = "user_phone"
+
 	ContextKeySystemPromptOverride ContextKey = "system_prompt_override"
 )

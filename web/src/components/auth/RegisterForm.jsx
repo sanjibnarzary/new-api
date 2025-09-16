@@ -62,6 +62,13 @@ const RegisterForm = () => {
     email: '',
     verification_code: '',
     wechat_verification_code: '',
+    full_name: '',
+    address_line1: '',
+    address_postal_code: '',
+    address_city: '',
+    address_state: '',
+    address_country: '',
+    phone: '',
   });
   const { username, password, password2 } = inputs;
   const [userState, userDispatch] = useContext(UserContext);
@@ -312,7 +319,7 @@ const RegisterForm = () => {
           <Card className='border-0 !rounded-2xl overflow-hidden'>
             <div className='flex justify-center pt-6 pb-2'>
               <Title heading={3} className='text-gray-800 dark:text-gray-200'>
-                {t('注 册')}
+                {t('Register')}
               </Title>
             </div>
             <div className='px-2 py-8'>
@@ -328,7 +335,7 @@ const RegisterForm = () => {
                     onClick={onWeChatLoginClicked}
                     loading={wechatLoading}
                   >
-                    <span className='ml-3'>{t('使用 微信 继续')}</span>
+                    <span className='ml-3'>Continue with WeChat</span>
                   </Button>
                 )}
 
@@ -341,7 +348,7 @@ const RegisterForm = () => {
                     onClick={handleGitHubClick}
                     loading={githubLoading}
                   >
-                    <span className='ml-3'>{t('使用 GitHub 继续')}</span>
+                    <span className='ml-3'>Continue with GitHub</span>
                   </Button>
                 )}
 
@@ -354,7 +361,7 @@ const RegisterForm = () => {
                     onClick={handleOIDCClick}
                     loading={oidcLoading}
                   >
-                    <span className='ml-3'>{t('使用 OIDC 继续')}</span>
+                    <span className='ml-3'>Continue with OIDC</span>
                   </Button>
                 )}
 
@@ -375,7 +382,7 @@ const RegisterForm = () => {
                     onClick={handleLinuxDOClick}
                     loading={linuxdoLoading}
                   >
-                    <span className='ml-3'>{t('使用 LinuxDO 继续')}</span>
+                    <span className='ml-3'>Continue with LinuxDO</span>
                   </Button>
                 )}
 
@@ -389,7 +396,7 @@ const RegisterForm = () => {
                 )}
 
                 <Divider margin='12px' align='center'>
-                  {t('或')}
+                  or
                 </Divider>
 
                 <Button
@@ -400,18 +407,18 @@ const RegisterForm = () => {
                   onClick={handleEmailRegisterClick}
                   loading={emailRegisterLoading}
                 >
-                  <span className='ml-3'>{t('使用 用户名 注册')}</span>
+                  <span className='ml-3'>Register with Username</span>
                 </Button>
               </div>
 
               <div className='mt-6 text-center text-sm'>
                 <Text>
-                  {t('已有账户？')}{' '}
+                  Already have an account?{' '}
                   <Link
                     to='/login'
                     className='text-blue-600 hover:text-blue-800 font-medium'
                   >
-                    {t('登录')}
+                    Login
                   </Link>
                 </Text>
               </div>
@@ -423,6 +430,8 @@ const RegisterForm = () => {
   };
 
   const renderEmailRegisterForm = () => {
+    // Country options (ISO 3166-1 alpha-2)
+    
     return (
       <div className='flex flex-col items-center'>
         <div className='w-full max-w-md'>
@@ -436,50 +445,55 @@ const RegisterForm = () => {
           <Card className='border-0 !rounded-2xl overflow-hidden'>
             <div className='flex justify-center pt-6 pb-2'>
               <Title heading={3} className='text-gray-800 dark:text-gray-200'>
-                {t('注 册')}
+                {t('Register')}
               </Title>
             </div>
             <div className='px-2 py-8'>
               <Form className='space-y-3'>
                 <Form.Input
                   field='username'
-                  label={t('用户名')}
-                  placeholder={t('请输入用户名')}
+                  label={t('Username')}
+                  placeholder={t('Enter username')}
                   name='username'
                   onChange={(value) => handleChange('username', value)}
                   prefix={<IconUser />}
+                  required
                 />
 
                 <Form.Input
                   field='password'
-                  label={t('密码')}
-                  placeholder={t('输入密码，最短 8 位，最长 20 位')}
+                  label={t('Password')}
+                  placeholder={t('Enter password, min 8 chars')}
                   name='password'
                   mode='password'
                   onChange={(value) => handleChange('password', value)}
                   prefix={<IconLock />}
+                  required
                 />
 
                 <Form.Input
                   field='password2'
-                  label={t('确认密码')}
-                  placeholder={t('确认密码')}
+                  label={t('Confirm Password')}
+                  placeholder={t('Confirm password')}
                   name='password2'
                   mode='password'
                   onChange={(value) => handleChange('password2', value)}
                   prefix={<IconLock />}
+                  required
                 />
+
 
                 {showEmailVerification && (
                   <>
                     <Form.Input
                       field='email'
-                      label={t('邮箱')}
-                      placeholder={t('输入邮箱地址')}
+                      label={t('Email')}
+                      placeholder={t('Enter email address')}
                       name='email'
                       type='email'
                       onChange={(value) => handleChange('email', value)}
                       prefix={<IconMail />}
+                      
                       suffix={
                         <Button
                           onClick={sendVerificationCode}
@@ -487,20 +501,21 @@ const RegisterForm = () => {
                           disabled={disableButton || verificationCodeLoading}
                         >
                           {disableButton
-                            ? `${t('重新发送')} (${countdown})`
-                            : t('获取验证码')}
+                            ? `${t('Resend')} (${countdown})`
+                            : t('Get Code')}
                         </Button>
                       }
                     />
                     <Form.Input
                       field='verification_code'
-                      label={t('验证码')}
-                      placeholder={t('输入验证码')}
+                      label={t('Verification Code')}
+                      placeholder={t('Enter verification code')}
                       name='verification_code'
                       onChange={(value) =>
                         handleChange('verification_code', value)
                       }
                       prefix={<IconKey />}
+                      
                     />
                   </>
                 )}
@@ -514,7 +529,7 @@ const RegisterForm = () => {
                     onClick={handleSubmit}
                     loading={registerLoading}
                   >
-                    {t('注册')}
+                    {t('Register')}
                   </Button>
                 </div>
               </Form>

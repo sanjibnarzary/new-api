@@ -94,33 +94,51 @@ func Login(c *gin.Context) {
 
 // setup session & cookies and then return user info
 func setupLogin(user *model.User, c *gin.Context) {
-	session := sessions.Default(c)
-	session.Set("id", user.Id)
-	session.Set("username", user.Username)
-	session.Set("role", user.Role)
-	session.Set("status", user.Status)
-	session.Set("group", user.Group)
-	err := session.Save()
-	if err != nil {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "无法保存会话信息，请重试",
-			"success": false,
-		})
-		return
-	}
-	cleanUser := model.User{
-		Id:          user.Id,
-		Username:    user.Username,
-		DisplayName: user.DisplayName,
-		Role:        user.Role,
-		Status:      user.Status,
-		Group:       user.Group,
-	}
-	c.JSON(http.StatusOK, gin.H{
-		"message": "",
-		"success": true,
-		"data":    cleanUser,
-	})
+       session := sessions.Default(c)
+       session.Set("id", user.Id)
+       session.Set("username", user.Username)
+       session.Set("role", user.Role)
+       session.Set("status", user.Status)
+       session.Set("group", user.Group)
+       // Set only normalized address fields in session
+       session.Set("user_full_name", user.FullName)
+       session.Set("user_address_line1", user.AddressLine1)
+       session.Set("user_address_postal_code", user.AddressPostalCode)
+       session.Set("user_address_city", user.AddressCity)
+       session.Set("user_address_state", user.AddressState)
+       session.Set("user_address_country", user.AddressCountry)
+       session.Set("user_country_code", user.CountryCode)
+       session.Set("user_phone", user.Phone)
+       err := session.Save()
+       if err != nil {
+	       c.JSON(http.StatusOK, gin.H{
+		       "message": "无法保存会话信息，请重试",
+		       "success": false,
+	       })
+	       return
+       }
+       // Return user object with normalized address fields only
+       cleanUser := model.User{
+	       Id:          user.Id,
+	       Username:    user.Username,
+	       DisplayName: user.DisplayName,
+	       Role:        user.Role,
+	       Status:      user.Status,
+	       Group:       user.Group,
+	       FullName:    user.FullName,
+	       AddressLine1: user.AddressLine1,
+	       AddressPostalCode: user.AddressPostalCode,
+	       AddressCity: user.AddressCity,
+	       AddressState: user.AddressState,
+	       AddressCountry: user.AddressCountry,
+	       CountryCode: user.CountryCode,
+	       Phone:       user.Phone,
+       }
+       c.JSON(http.StatusOK, gin.H{
+	       "message": "",
+	       "success": true,
+	       "data":    cleanUser,
+       })
 }
 
 func Logout(c *gin.Context) {
@@ -443,28 +461,37 @@ func GetSelf(c *gin.Context) {
 	userSetting := user.GetSetting()
 
 	// 构建响应数据，包含用户信息和权限
-	responseData := map[string]interface{}{
-		"id":                user.Id,
-		"username":          user.Username,
-		"display_name":      user.DisplayName,
-		"role":              user.Role,
-		"status":            user.Status,
-		"email":             user.Email,
-		"group":             user.Group,
-		"quota":             user.Quota,
-		"used_quota":        user.UsedQuota,
-		"request_count":     user.RequestCount,
-		"aff_code":          user.AffCode,
-		"aff_count":         user.AffCount,
-		"aff_quota":         user.AffQuota,
-		"aff_history_quota": user.AffHistoryQuota,
-		"inviter_id":        user.InviterId,
-		"linux_do_id":       user.LinuxDOId,
-		"setting":           user.Setting,
-		"stripe_customer":   user.StripeCustomer,
-		"sidebar_modules":   userSetting.SidebarModules, // 正确提取sidebar_modules字段
-		"permissions":       permissions,                // 新增权限字段
-	}
+       responseData := map[string]interface{}{
+	       "id":                user.Id,
+	       "username":          user.Username,
+	       "display_name":      user.DisplayName,
+	       "role":              user.Role,
+	       "status":            user.Status,
+	       "email":             user.Email,
+	       "group":             user.Group,
+	       "quota":             user.Quota,
+	       "used_quota":        user.UsedQuota,
+	       "request_count":     user.RequestCount,
+	       "aff_code":          user.AffCode,
+	       "aff_count":         user.AffCount,
+	       "aff_quota":         user.AffQuota,
+	       "aff_history_quota": user.AffHistoryQuota,
+	       "inviter_id":        user.InviterId,
+	       "linux_do_id":       user.LinuxDOId,
+	       "setting":           user.Setting,
+	       "stripe_customer":   user.StripeCustomer,
+	       "sidebar_modules":   userSetting.SidebarModules, // 正确提取sidebar_modules字段
+	       "permissions":       permissions,                // 新增权限字段
+	       // Add profile fields for UI
+	       "full_name":         user.FullName,
+	       "address_line1":     user.AddressLine1,
+	       "address_postal_code": user.AddressPostalCode,
+	       "address_city":      user.AddressCity,
+	       "address_state":     user.AddressState,
+	       "address_country":   user.AddressCountry,
+	       "country_code":      user.CountryCode,
+	       "phone":             user.Phone,
+       }
 
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
@@ -713,42 +740,65 @@ func UpdateSelf(c *gin.Context) {
 		return
 	}
 
-	if user.Password == "" {
-		user.Password = "$I_LOVE_U" // make Validator happy :)
-	}
-	if err := common.Validate.Struct(&user); err != nil {
-		c.JSON(http.StatusOK, gin.H{
-			"success": false,
-			"message": "输入不合法 " + err.Error(),
-		})
-		return
-	}
-
-	cleanUser := model.User{
-		Id:          c.GetInt("id"),
-		Username:    user.Username,
-		Password:    user.Password,
-		DisplayName: user.DisplayName,
-	}
-	if user.Password == "$I_LOVE_U" {
-		user.Password = "" // rollback to what it should be
-		cleanUser.Password = ""
-	}
-	updatePassword, err := checkUpdatePassword(user.OriginalPassword, user.Password, cleanUser.Id)
-	if err != nil {
-		common.ApiError(c, err)
-		return
-	}
-	if err := cleanUser.Update(updatePassword); err != nil {
-		common.ApiError(c, err)
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"success": true,
-		"message": "",
-	})
-	return
+       // Only require original password if password is being changed
+       updatePassword := false
+       if user.Password != "" && user.Password != "$I_LOVE_U" {
+	       // Password change requested
+	       if user.OriginalPassword == "" {
+		       c.JSON(http.StatusOK, gin.H{
+			       "success": false,
+			       "message": "原密码不能为空",
+		       })
+		       return
+	       }
+	       // Validate original password
+	       valid := common.ValidatePasswordAndHash(user.OriginalPassword, user.Password)
+	       if !valid {
+		       c.JSON(http.StatusOK, gin.H{
+			       "success": false,
+			       "message": "原密码错误",
+		       })
+		       return
+	       }
+	       updatePassword = true
+       }
+       if user.Password == "" {
+	       user.Password = "$I_LOVE_U" // make Validator happy :)
+       }
+       if err := common.Validate.Struct(&user); err != nil {
+	       c.JSON(http.StatusOK, gin.H{
+		       "success": false,
+		       "message": "输入不合法 " + err.Error(),
+	       })
+	       return
+       }
+       cleanUser := model.User{
+	       Id:          c.GetInt("id"),
+	       Username:    user.Username,
+	       Password:    user.Password,
+	       DisplayName: user.DisplayName,
+	       FullName:    user.FullName,
+	       AddressLine1: user.AddressLine1,
+	       AddressPostalCode: user.AddressPostalCode,
+	       AddressCity: user.AddressCity,
+	       AddressState: user.AddressState,
+	       AddressCountry: user.AddressCountry,
+	       CountryCode: user.CountryCode,
+	       Phone:       user.Phone,
+       }
+       if user.Password == "$I_LOVE_U" {
+	       user.Password = "" // rollback to what it should be
+	       cleanUser.Password = ""
+       }
+       if err := cleanUser.Update(updatePassword); err != nil {
+	       common.ApiError(c, err)
+	       return
+       }
+       c.JSON(http.StatusOK, gin.H{
+	       "success": true,
+	       "message": "",
+       })
+       return
 }
 
 func checkUpdatePassword(originalPassword string, newPassword string, userId int) (updatePassword bool, err error) {

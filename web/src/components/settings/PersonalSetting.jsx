@@ -34,6 +34,24 @@ import AccountDeleteModal from './personal/modals/AccountDeleteModal';
 import ChangePasswordModal from './personal/modals/ChangePasswordModal';
 
 const PersonalSetting = () => {
+  // Handler for updating profile fields (FullName, Address, CountryCode, Phone)
+  const handleUpdateProfile = async (field, value) => {
+    if (!userState.user) return;
+    const payload = { [field]: value };
+    try {
+      const res = await API.put('/api/user/self', payload);
+      const { success, message, data } = res.data;
+      if (success) {
+        showSuccess(t('保存成功'));
+        // Update userState with new value
+        userDispatch({ type: 'login', payload: { ...userState.user, ...payload } });
+      } else {
+        showError(message);
+      }
+    } catch (error) {
+      showError(t('保存失败'));
+    }
+  };
   const [userState, userDispatch] = useContext(UserContext);
   let navigate = useNavigate();
   const { t } = useTranslation();
@@ -323,6 +341,7 @@ const PersonalSetting = () => {
               handleSystemTokenClick={handleSystemTokenClick}
               setShowChangePasswordModal={setShowChangePasswordModal}
               setShowAccountDeleteModal={setShowAccountDeleteModal}
+              onUpdateProfile={handleUpdateProfile}
             />
 
             {/* 右侧：其他设置 */}

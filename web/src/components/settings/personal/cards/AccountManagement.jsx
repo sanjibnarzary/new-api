@@ -29,6 +29,7 @@ import {
   TabPane,
   Popover,
 } from '@douyinfe/semi-ui';
+import { Select } from '@douyinfe/semi-ui';
 import {
   IconMail,
   IconShield,
@@ -47,6 +48,8 @@ import {
 } from '../../../../helpers';
 import TwoFASetting from '../components/TwoFASetting';
 
+import { useState } from 'react';
+
 const AccountManagement = ({
   t,
   userState,
@@ -58,7 +61,78 @@ const AccountManagement = ({
   handleSystemTokenClick,
   setShowChangePasswordModal,
   setShowAccountDeleteModal,
+  onUpdateProfile, // Optional: callback for updating profile fields
 }) => {
+  const countryOptions = [
+    { value: 'US', label: 'United States' },
+    { value: 'CN', label: 'China' },
+    { value: 'IN', label: 'India' },
+    { value: 'GB', label: 'United Kingdom' },
+    { value: 'DE', label: 'Germany' },
+    { value: 'FR', label: 'France' },
+    { value: 'JP', label: 'Japan' },
+    { value: 'KR', label: 'South Korea' },
+    { value: 'CA', label: 'Canada' },
+    { value: 'BR', label: 'Brazil' },
+    { value: 'RU', label: 'Russia' },
+    { value: 'AU', label: 'Australia' },
+    { value: 'IT', label: 'Italy' },
+    { value: 'ES', label: 'Spain' },
+    { value: 'SG', label: 'Singapore' },
+    { value: 'ZA', label: 'South Africa' },
+    { value: 'MX', label: 'Mexico' },
+    { value: 'TR', label: 'Turkey' },
+    { value: 'ID', label: 'Indonesia' },
+    { value: 'AR', label: 'Argentina' },
+    // ...add more as needed
+  ];
+  // Modal state for editing all profile fields together
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editForm, setEditForm] = useState({
+    full_name: userState.user?.full_name || '',
+    address_line1: userState.user?.address_line1 || '',
+    address_postal_code: userState.user?.address_postal_code || '',
+    address_city: userState.user?.address_city || '',
+    address_state: userState.user?.address_state || '',
+    address_country: userState.user?.address_country || '',
+    country_code: userState.user?.country_code || '',
+    phone: userState.user?.phone || '',
+  });
+
+  const handleEditClick = () => {
+    setEditForm({
+      full_name: userState.user?.full_name || '',
+      address_line1: userState.user?.address_line1 || '',
+      address_postal_code: userState.user?.address_postal_code || '',
+      address_city: userState.user?.address_city || '',
+      address_state: userState.user?.address_state || '',
+      address_country: userState.user?.address_country || '',
+      country_code: userState.user?.country_code || '',
+      phone: userState.user?.phone || '',
+    });
+    setShowEditModal(true);
+  };
+
+  const handleEditFormChange = (field, value) => {
+    setEditForm((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleEditSave = () => {
+    if (onUpdateProfile) {
+      onUpdateProfile('full_name', editForm.full_name);
+      onUpdateProfile('address_line1', editForm.address_line1);
+      onUpdateProfile('address_postal_code', editForm.address_postal_code);
+      onUpdateProfile('address_city', editForm.address_city);
+      onUpdateProfile('address_state', editForm.address_state);
+      onUpdateProfile('country_code', editForm.country_code);
+      onUpdateProfile('phone', editForm.phone);
+    }
+    setShowEditModal(false);
+  };
+
+  const handleEditCancel = () => {
+    setShowEditModal(false);
+  };
   const renderAccountInfo = (accountId, label) => {
     if (!accountId || accountId === '') {
       return <span className='text-gray-500'>{t('未绑定')}</span>;
@@ -85,34 +159,160 @@ const AccountManagement = ({
   };
   return (
     <Card className='!rounded-2xl'>
-      {/* 卡片头部 */}
+      {/* Card Header */}
       <div className='flex items-center mb-4'>
         <Avatar size='small' color='teal' className='mr-3 shadow-md'>
           <UserPlus size={16} />
         </Avatar>
         <div>
           <Typography.Text className='text-lg font-medium'>
-            {t('账户管理')}
+            {t('Account Management')}
           </Typography.Text>
           <div className='text-xs text-gray-600'>
-            {t('账户绑定、安全设置和身份验证')}
+            {t('Account binding, security settings, and authentication')}
           </div>
         </div>
       </div>
 
       <Tabs type='card' defaultActiveKey='binding'>
+        {/* Single Edit Modal for all profile fields */}
+        {showEditModal && (
+          <div className='fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30'>
+            <Card className='w-[400px] !rounded-xl'>
+              <Typography.Title heading={6} className='mb-2'>
+                {t('Edit Profile')}
+              </Typography.Title>
+              <Space vertical className='w-full'>
+                <Input
+                  value={editForm.full_name}
+                  onChange={v => handleEditFormChange('full_name', v)}
+                  placeholder={t('Full Name')}
+                  size='large'
+                  label={t('Full Name')}
+                  className='mb-2'
+                />
+                <Input
+                  value={editForm.address_line1}
+                  onChange={v => handleEditFormChange('address_line1', v)}
+                  placeholder={t('Street Address')}
+                  size='large'
+                  label={t('Street Address')}
+                  className='mb-2'
+                />
+                <Input
+                  value={editForm.address_postal_code}
+                  onChange={v => handleEditFormChange('address_postal_code', v)}
+                  placeholder={t('Postal Code')}
+                  size='large'
+                  label={t('Postal Code')}
+                  className='mb-2'
+                />
+                <Input
+                  value={editForm.address_city}
+                  onChange={v => handleEditFormChange('address_city', v)}
+                  placeholder={t('City')}
+                  size='large'
+                  label={t('City')}
+                  className='mb-2'
+                />
+                <Input
+                  value={editForm.address_state}
+                  onChange={v => handleEditFormChange('address_state', v)}
+                  placeholder={t('State')}
+                  size='large'
+                  label={t('State')}
+                  className='mb-2'
+                />
+                {/* <Input
+                  value={editForm.address_country}
+                  onChange={v => handleEditFormChange('address_country', v)}
+                  placeholder={t('Country')}
+                  size='large'
+                  label={t('Country')}
+                  className='mb-2'
+                /> */}
+                  <Select
+                    value={editForm.country_code}
+                    onChange={v => handleEditFormChange('country_code', v)}
+                    placeholder={t('Country Code')}
+                    size='large'
+                    label={t('Country Code')}
+                    className='mb-2'
+                    optionList={countryOptions}
+                    showClear
+                    filter
+                  />
+                <Input
+                  value={editForm.phone}
+                  onChange={v => handleEditFormChange('phone', v)}
+                  placeholder={t('Phone Number')}
+                  size='large'
+                  label={t('Phone Number')}
+                  className='mb-2'
+                />
+              </Space>
+              <Space className='mt-4 flex justify-end'>
+                <Button onClick={handleEditCancel}>{t('Cancel')}</Button>
+                <Button type='primary' onClick={handleEditSave}>{t('Save')}</Button>
+              </Space>
+            </Card>
+          </div>
+        )}
         {/* 账户绑定 Tab */}
         <TabPane
           tab={
             <div className='flex items-center'>
               <UserPlus size={16} className='mr-2' />
-              {t('账户绑定')}
+              {t('Account Binding')}
             </div>
           }
           itemKey='binding'
         >
           <div className='py-4'>
             <div className='grid grid-cols-1 lg:grid-cols-2 gap-4'>
+              {/* Profile Info Card with single edit button */}
+              <Card className='!rounded-xl col-span-2'>
+                <div className='flex items-center justify-between gap-3'>
+                  <div className='flex flex-col flex-1 min-w-0 gap-2'>
+                    <div className='flex items-center gap-2'>
+                      <Avatar color='blue'>FN</Avatar>
+                      <span className='font-medium text-gray-900'>Full Name:</span>
+                      <span className='text-sm text-gray-500 truncate'>{userState.user?.full_name || '-'}</span>
+                    </div>
+                    <div className='flex items-center gap-2'>
+                      <Avatar color='orange'>Addr</Avatar>
+                      <span className='font-medium text-gray-900'>Address:</span>
+                      <span className='text-sm text-gray-500 truncate'>
+                        {userState.user?.address_line1 || '-'}
+                        {userState.user?.address_postal_code ? ', ' + userState.user?.address_postal_code : ''}
+                        {userState.user?.address_city ? ', ' + userState.user?.address_city : ''}
+                        {userState.user?.address_state ? ', ' + userState.user?.address_state : ''}
+                        {userState.user?.address_country ? ', ' + userState.user?.address_country : ''}
+                      </span>
+                    </div>
+                    <div className='flex items-center gap-2'>
+                      <Avatar color='green'>Country</Avatar>
+                      <span className='font-medium text-gray-900'>Country Code:</span>
+                      <span className='text-sm text-gray-500 truncate'>{userState.user?.country_code || '-'}</span>
+                    </div>
+                    <div className='flex items-center gap-2'>
+                      <Avatar color='purple'>Phone</Avatar>
+                      <span className='font-medium text-gray-900'>Phone:</span>
+                      <span className='text-sm text-gray-500 truncate'>{userState.user?.phone || '-'}</span>
+                    </div>
+                  </div>
+                  <div className='flex-shrink-0'>
+                    <Button
+                      type='primary'
+                      theme='outline'
+                      size='small'
+                      onClick={handleEditClick}
+                    >
+                      {t('Edit')}
+                    </Button>
+                  </div>
+                </div>
+              </Card>
               {/* 邮箱绑定 */}
               <Card className='!rounded-xl'>
                 <div className='flex items-center justify-between gap-3'>
@@ -125,12 +325,12 @@ const AccountManagement = ({
                     </div>
                     <div className='flex-1 min-w-0'>
                       <div className='font-medium text-gray-900'>
-                        {t('邮箱')}
+                        {t('Email')}
                       </div>
                       <div className='text-sm text-gray-500 truncate'>
                         {renderAccountInfo(
                           userState.user?.email,
-                          t('邮箱地址'),
+                          t('Email Address'),
                         )}
                       </div>
                     </div>
@@ -162,12 +362,12 @@ const AccountManagement = ({
                     </div>
                     <div className='flex-1 min-w-0'>
                       <div className='font-medium text-gray-900'>
-                        {t('微信')}
+                        {t('WeChat')}
                       </div>
                       <div className='text-sm text-gray-500 truncate'>
                         {userState.user && userState.user.wechat_id !== ''
-                          ? t('已绑定')
-                          : t('未绑定')}
+                          ? t('Bound')
+                          : t('Not Bound')}
                       </div>
                     </div>
                   </div>
@@ -368,7 +568,7 @@ const AccountManagement = ({
           tab={
             <div className='flex items-center'>
               <ShieldCheck size={16} className='mr-2' />
-              {t('安全设置')}
+              {t('Security Settings')}
             </div>
           }
           itemKey='security'
@@ -385,10 +585,10 @@ const AccountManagement = ({
                       </div>
                       <div className='flex-1'>
                         <Typography.Title heading={6} className='mb-1'>
-                          {t('系统访问令牌')}
+                          {t('System Access Token')}
                         </Typography.Title>
                         <Typography.Text type='tertiary' className='text-sm'>
-                          {t('用于API调用的身份验证令牌，请妥善保管')}
+                          {t('Authentication token for API calls, please keep it safe')}
                         </Typography.Text>
                         {systemToken && (
                           <div className='mt-3'>
@@ -414,6 +614,11 @@ const AccountManagement = ({
                     </Button>
                   </div>
                 </Card>
+                {/* Added space between cards */}
+                
+
+              
+
 
                 {/* 密码管理 */}
                 <Card className='!rounded-xl w-full'>
@@ -424,10 +629,10 @@ const AccountManagement = ({
                       </div>
                       <div>
                         <Typography.Title heading={6} className='mb-1'>
-                          {t('密码管理')}
+                          {t('Password Management')}
                         </Typography.Title>
                         <Typography.Text type='tertiary' className='text-sm'>
-                          {t('定期更改密码可以提高账户安全性')}
+                          {t('Regularly changing your password can improve account security')}
                         </Typography.Text>
                       </div>
                     </div>
@@ -458,10 +663,10 @@ const AccountManagement = ({
                           heading={6}
                           className='mb-1 text-slate-700'
                         >
-                          {t('删除账户')}
+                          {t('Delete Account')}
                         </Typography.Title>
                         <Typography.Text type='tertiary' className='text-sm'>
-                          {t('此操作不可逆，所有数据将被永久删除')}
+                          {t('This action is irreversible, all data will be permanently deleted')}
                         </Typography.Text>
                       </div>
                     </div>

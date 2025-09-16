@@ -24,7 +24,15 @@ type User struct {
 	DisplayName      string         `json:"display_name" gorm:"index" validate:"max=20"`
 	Role             int            `json:"role" gorm:"type:int;default:1"`   // admin, common
 	Status           int            `json:"status" gorm:"type:int;default:1"` // enabled, disabled
-	Email            string         `json:"email" gorm:"index" validate:"max=50"`
+	FullName		 string         `json:"full_name" gorm:"type:varchar(100);" validate:"max=100"` // Full name Newly added
+	AddressLine1     string         `json:"address_line1" gorm:"type:varchar(255);" validate:"max=255"` // Address line 1
+	AddressPostalCode string         `json:"address_postal_code" gorm:"type:varchar(20);" validate:"max=20"` // Postal code
+	AddressCity      string         `json:"address_city" gorm:"type:varchar(100);" validate:"max=100"` // City
+	AddressState     string         `json:"address_state" gorm:"type:varchar(100);" validate:"max=100"` // State
+	AddressCountry   string         `json:"address_country" gorm:"type:varchar(100);" validate:"max=100"` // Country
+	CountryCode	     string         `json:"country_code" gorm:"type:char(3); default:'IN';" validate:"max=3"` // Country code Newly added
+	Phone		 	 string         `json:"phone" gorm:"type:varchar(20);" validate:"max=20"` // Phone number Newly added
+	Email            string         `json:"email" gorm:"index;type:varchar(50);" validate:"max=50"`
 	GitHubId         string         `json:"github_id" gorm:"column:github_id;index"`
 	OidcId           string         `json:"oidc_id" gorm:"column:oidc_id;index"`
 	WeChatId         string         `json:"wechat_id" gorm:"column:wechat_id;index"`
@@ -48,17 +56,25 @@ type User struct {
 }
 
 func (user *User) ToBaseUser() *UserBase {
-	cache := &UserBase{
-		Id:       user.Id,
-		Group:    user.Group,
-		Quota:    user.Quota,
-		Status:   user.Status,
-		Username: user.Username,
-		Setting:  user.Setting,
-		Email:    user.Email,
-	}
+       cache := &UserBase{
+	       Id:       user.Id,
+	       Group:    user.Group,
+	       Quota:    user.Quota,
+	       Status:   user.Status,
+	       Username: user.Username,
+	       Setting:  user.Setting,
+	       Email:    user.Email,
+	       FullName: user.FullName,
+	       AddressLine1: user.AddressLine1,
+	       AddressPostalCode: user.AddressPostalCode,
+	       AddressCity: user.AddressCity,
+	       AddressState: user.AddressState,
+	       AddressCountry: user.AddressCountry,
+	       Phone:    user.Phone,
+       }
 	return cache
 }
+
 
 func (user *User) GetAccessToken() string {
 	if user.AccessToken == nil {
@@ -80,6 +96,13 @@ func (user *User) GetSetting() dto.UserSetting {
 		}
 	}
 	return setting
+}
+
+// set user FullName, Address, CountryCode, Phone
+func (user *User) SetContactInfo(fullName, address, countryCode, phone string) {
+	user.FullName = fullName
+	// You may want to split address and countryCode into the new fields here
+	user.Phone = phone
 }
 
 func (user *User) SetSetting(setting dto.UserSetting) {
