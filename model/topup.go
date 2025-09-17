@@ -166,7 +166,7 @@ func RechargeCreem(referenceId string, customerEmail string, customerName string
 		return errors.New("充值失败，" + err.Error())
 	}
 
-	RecordLog(topUp.UserId, LogTypeTopup, fmt.Sprintf("使用Creem充值成功，充值额度: %v，支付金额：%.2f，客户邮箱：%s", common.FormatQuota(int(quota)), topUp.Money, customerEmail))
+	RecordLog(topUp.UserId, LogTypeTopup, fmt.Sprintf("使用Creem充值成功，充值额度: %v，支付金额：%.2f，客户邮箱：%s", logger.FormatQuota(int(quota)), topUp.Money, customerEmail))
 
 	return nil
 }

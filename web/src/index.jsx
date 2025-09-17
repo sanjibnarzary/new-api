@@ -46,7 +46,7 @@ if (typeof window !== 'undefined') {
 function SemiLocaleWrapper({ children }) {
   const { i18n } = useTranslation();
   const semiLocale = React.useMemo(
-    () => ({ zh: zh_CN, en: en_GB })[i18n.language] || zh_CN,
+    () => ({ zh: zh_CN, en: en_GB })[i18n.language] || en_GB,
     [i18n.language],
   );
   return <LocaleProvider locale={semiLocale}>{children}</LocaleProvider>;

@@ -20,7 +20,7 @@ For commercial licensing, please contact support@quantumnous.com
 import React from 'react';
 import { Button, Dropdown } from '@douyinfe/semi-ui';
 import { Languages } from 'lucide-react';
-import { CN, GB } from 'country-flag-icons/react/3x2';
+import { CN, GB, IN } from 'country-flag-icons/react/3x2';
 
 const LanguageSelector = ({ currentLang, onLanguageChange, t }) => {
   return (
@@ -29,19 +29,34 @@ const LanguageSelector = ({ currentLang, onLanguageChange, t }) => {
       render={
         <Dropdown.Menu className='!bg-semi-color-bg-overlay !border-semi-color-border !shadow-lg !rounded-lg dark:!bg-gray-700 dark:!border-gray-600'>
           <Dropdown.Item
-            onClick={() => onLanguageChange('zh')}
-            className={`!flex !items-center !gap-2 !px-3 !py-1.5 !text-sm !text-semi-color-text-0 dark:!text-gray-200 ${currentLang === 'zh' ? '!bg-semi-color-primary-light-default dark:!bg-blue-600 !font-semibold' : 'hover:!bg-semi-color-fill-1 dark:hover:!bg-gray-600'}`}
-          >
-            <CN title='中文' className='!w-5 !h-auto' />
-            <span>中文</span>
-          </Dropdown.Item>
-          <Dropdown.Item
             onClick={() => onLanguageChange('en')}
             className={`!flex !items-center !gap-2 !px-3 !py-1.5 !text-sm !text-semi-color-text-0 dark:!text-gray-200 ${currentLang === 'en' ? '!bg-semi-color-primary-light-default dark:!bg-blue-600 !font-semibold' : 'hover:!bg-semi-color-fill-1 dark:hover:!bg-gray-600'}`}
           >
             <GB title='English' className='!w-5 !h-auto' />
             <span>English</span>
           </Dropdown.Item>
+           <Dropdown.Item
+            onClick={() => onLanguageChange('brx')}
+            className={`!flex !items-center !gap-2 !px-3 !py-1.5 !text-sm !text-semi-color-text-0 dark:!text-gray-200 ${currentLang === 'brx' ? '!bg-semi-color-primary-light-default dark:!bg-blue-600 !font-semibold' : 'hover:!bg-semi-color-fill-1 dark:hover:!bg-gray-600'}`}
+          >
+            <IN title="बर'" className='!w-5 !h-auto' />
+            <span>बर'/बड़ो</span>
+          </Dropdown.Item>
+           <Dropdown.Item
+            onClick={() => onLanguageChange('hi')}
+            className={`!flex !items-center !gap-2 !px-3 !py-1.5 !text-sm !text-semi-color-text-0 dark:!text-gray-200 ${currentLang === 'hi' ? '!bg-semi-color-primary-light-default dark:!bg-blue-600 !font-semibold' : 'hover:!bg-semi-color-fill-1 dark:hover:!bg-gray-600'}`}
+          >
+            <IN title='हिन्दी' className='!w-5 !h-auto' />
+            <span>हिन्दी</span>
+          </Dropdown.Item>
+           <Dropdown.Item
+            onClick={() => onLanguageChange('zh')}
+            className={`!flex !items-center !gap-2 !px-3 !py-1.5 !text-sm !text-semi-color-text-0 dark:!text-gray-200 ${currentLang === 'zh' ? '!bg-semi-color-primary-light-default dark:!bg-blue-600 !font-semibold' : 'hover:!bg-semi-color-fill-1 dark:hover:!bg-gray-600'}`}
+          >
+            <CN title='中文' className='!w-5 !h-auto' />
+            <span>中文</span>
+          </Dropdown.Item>
+           
         </Dropdown.Menu>
       }
     >
