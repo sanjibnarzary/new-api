@@ -3,6 +3,7 @@
 services:
   new-api:
     image: ghcr.io/sanjibnarzary/new-api:v0.2.5
+    #platform: linux/arm64/v8
     container_name: new-api
     restart: always
     command: --log-dir /app/logs
