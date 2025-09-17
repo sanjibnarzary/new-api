@@ -25,6 +25,26 @@ import enTranslation from './locales/en.json';
 import zhTranslation from './locales/zh.json';
 import hiTranslation from './locales/hi.json';
 import brxTranslation from './locales/brx.json';
+import asTranslation from './locales/as.json';
+import bnTranslation from './locales/bn.json';
+import guTranslation from './locales/gu.json';
+import knTranslation from './locales/kn.json';
+import ksTranslation from './locales/ks.json';
+import kokTranslation from './locales/kok.json';
+import mlTranslation from './locales/ml.json';
+import mniTranslation from './locales/mni.json';
+import mrTranslation from './locales/mr.json';
+import maiTranslation from './locales/mai.json';
+import neTranslation from './locales/ne.json';
+import orTranslation from './locales/or.json';
+import paTranslation from './locales/pa.json';
+import saTranslation from './locales/sa.json';
+import satTranslation from './locales/sat.json';
+import sdTranslation from './locales/sd.json';
+import taTranslation from './locales/ta.json';
+import teTranslation from './locales/te.json';
+import urTranslation from './locales/ur.json';
+import doiTranslation from './locales/doi.json';
 
 i18n
   .use(LanguageDetector)
@@ -43,6 +63,66 @@ i18n
       },
       brx: {
         translation: brxTranslation,
+      },
+      as: {
+        translation: asTranslation,
+      },
+      bn: {
+        translation: bnTranslation,
+      },
+      gu: {
+        translation: guTranslation,
+      },
+      kn: {
+        translation: knTranslation,
+      },
+      ks: {
+        translation: ksTranslation,
+      },
+      kok: {
+        translation: kokTranslation,
+      },
+      ml: {
+        translation: mlTranslation,
+      },
+      mni: {
+        translation: mniTranslation,
+      },
+      mr: {
+        translation: mrTranslation,
+      },
+      mai: {
+        translation: maiTranslation,
+      },
+      ne: {
+        translation: neTranslation,
+      },
+      or: {
+        translation: orTranslation,
+      },
+      pa: {
+        translation: paTranslation,
+      },
+      sa: {
+        translation: saTranslation,
+      },
+      sat: {
+        translation: satTranslation,
+      },
+      sd: {
+        translation: sdTranslation,
+      },
+      ta: {
+        translation: taTranslation,
+      },
+      te: {
+        translation: teTranslation,
+      },
+      ur: {
+        translation: urTranslation,
+      },
+      doi: {
+        translation: doiTranslation,
       },
     },
     fallbackLng: 'en',
