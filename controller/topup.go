@@ -47,14 +47,35 @@ func GetTopUpInfo(c *gin.Context) {
 		}
 	}
 
+	// 如果配置了 Razorpay（目前仅通过 webhook secret 判断可用性 + env keys）
+	if setting.RazorpayWebhookSecret != "" {
+		hasRazorpay := false
+		for _, method := range payMethods {
+			if method["type"] == "razorpay" {
+				hasRazorpay = true
+				break
+			}
+		}
+		if !hasRazorpay {
+			razorMethod := map[string]string{
+				"name":      "Razorpay",
+				"type":      "razorpay",
+				"color":     "rgba(var(--semi-orange-5), 1)",
+				"min_topup": strconv.Itoa(setting.StripeMinTopUp), // reuse stripe min or introduce dedicated later
+			}
+			payMethods = append(payMethods, razorMethod)
+		}
+	}
+
 	data := gin.H{
-		"enable_online_topup": operation_setting.PayAddress != "" && operation_setting.EpayId != "" && operation_setting.EpayKey != "",
-		"enable_stripe_topup": setting.StripeApiSecret != "" && setting.StripeWebhookSecret != "" && setting.StripePriceId != "",
-		"pay_methods":         payMethods,
-		"min_topup":           operation_setting.MinTopUp,
-		"stripe_min_topup":    setting.StripeMinTopUp,
-		"amount_options":      operation_setting.GetPaymentSetting().AmountOptions,
-		"discount":            operation_setting.GetPaymentSetting().AmountDiscount,
+		"enable_online_topup":   operation_setting.PayAddress != "" && operation_setting.EpayId != "" && operation_setting.EpayKey != "",
+		"enable_stripe_topup":   setting.StripeApiSecret != "" && setting.StripeWebhookSecret != "" && setting.StripePriceId != "",
+		"enable_razorpay_topup": setting.RazorpayWebhookSecret != "" && (setting.RazorpayKeyId != "" && setting.RazorpayKeySecret != ""),
+		"pay_methods":           payMethods,
+		"min_topup":             operation_setting.MinTopUp,
+		"stripe_min_topup":      setting.StripeMinTopUp,
+		"amount_options":        operation_setting.GetPaymentSetting().AmountOptions,
+		"discount":              operation_setting.GetPaymentSetting().AmountDiscount,
 	}
 	common.ApiSuccess(c, data)
 }

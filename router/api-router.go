@@ -40,6 +40,7 @@ func SetApiRouter(router *gin.Engine) {
 
 		apiRouter.POST("/stripe/webhook", controller.StripeWebhook)
 		apiRouter.POST("/creem/webhook", controller.CreemWebhook)
+		apiRouter.POST("/razorpay/webhook", controller.RazorpayWebhook)
 
 		userRoute := apiRouter.Group("/user")
 		{
@@ -67,6 +68,9 @@ func SetApiRouter(router *gin.Engine) {
 				selfRoute.POST("/amount", controller.RequestAmount)
 				selfRoute.POST("/stripe/pay", middleware.CriticalRateLimit(), controller.RequestStripePay)
 				selfRoute.POST("/stripe/amount", controller.RequestStripeAmount)
+				selfRoute.POST("/razorpay/pay", middleware.CriticalRateLimit(), controller.RequestRazorpayPay)
+				selfRoute.POST("/razorpay/amount", controller.RequestRazorpayAmount)
+				selfRoute.GET("/razorpay/public_key", controller.GetRazorpayPublicKey)
 				selfRoute.POST("/creem/pay", middleware.CriticalRateLimit(), controller.RequestCreemPay)
 				selfRoute.POST("/aff_transfer", controller.TransferAffQuota)
 				selfRoute.PUT("/setting", controller.UpdateUserSetting)

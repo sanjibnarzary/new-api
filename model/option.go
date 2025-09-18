@@ -86,6 +86,9 @@ func InitOptionMap() {
 	common.OptionMap["CreemProducts"] = setting.CreemProducts
 	common.OptionMap["CreemTestMode"] = strconv.FormatBool(setting.CreemTestMode)
 	common.OptionMap["CreemWebhookSecret"] = setting.CreemWebhookSecret
+	common.OptionMap["RazorpayWebhookSecret"] = setting.RazorpayWebhookSecret
+	common.OptionMap["RazorpayKeyId"] = setting.RazorpayKeyId
+	common.OptionMap["RazorpayKeySecret"] = setting.RazorpayKeySecret
 	common.OptionMap["TopupGroupRatio"] = common.TopupGroupRatio2JSONString()
 	common.OptionMap["Chats"] = setting.Chats2JsonString()
 	common.OptionMap["AutoGroups"] = setting.AutoGroups2JsonString()
@@ -339,6 +342,12 @@ func updateOptionMap(key string, value string) (err error) {
 		setting.CreemTestMode = value == "true"
 	case "CreemWebhookSecret":
 		setting.CreemWebhookSecret = value
+	case "RazorpayWebhookSecret":
+		setting.RazorpayWebhookSecret = value
+	case "RazorpayKeyId":
+		setting.RazorpayKeyId = value
+	case "RazorpayKeySecret":
+		setting.RazorpayKeySecret = value
 	case "TopupGroupRatio":
 		err = common.UpdateTopupGroupRatioByJSONString(value)
 	case "GitHubClientId":

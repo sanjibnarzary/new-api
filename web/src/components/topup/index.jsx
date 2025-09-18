@@ -132,7 +132,7 @@ const TopUp = () => {
   };
 
   const preTopUp = async (payment) => {
-    if (payment === 'stripe') {
+  if (payment === 'stripe' || payment === 'razorpay') {
       if (!enableStripeTopUp) {
         showError(t('管理员未开启Stripe充值！'));
         return;
@@ -149,6 +149,8 @@ const TopUp = () => {
     try {
       if (payment === 'stripe') {
         await getStripeAmount();
+      } else if (payment === 'razorpay') {
+        await getRazorpayAmount();
       } else {
         await getAmount();
       }
@@ -171,6 +173,10 @@ const TopUp = () => {
       if (amount === 0) {
         await getStripeAmount();
       }
+    } else if (payWay === 'razorpay') {
+      if (amount === 0) {
+        await getRazorpayAmount();
+      }
     } else {
       // 普通支付处理
       if (amount === 0) {
@@ -191,6 +197,11 @@ const TopUp = () => {
           amount: parseInt(topUpCount),
           payment_method: 'stripe',
         });
+      } else if (payWay === 'razorpay') {
+        res = await API.post('/api/user/razorpay/pay', {
+          amount: parseInt(topUpCount),
+          payment_method: 'razorpay',
+        });
       } else {
         // 普通支付请求
         res = await API.post('/api/user/pay', {
@@ -205,6 +216,26 @@ const TopUp = () => {
           if (payWay === 'stripe') {
             // Stripe 支付回调处理
             window.open(data.pay_link, '_blank');
+          } else if (payWay === 'razorpay') {
+            // Razorpay: expects order details; integrate checkout here or open link if provided
+            if (data && data.id) {
+              // Lazy load Razorpay script if not present
+              if (!document.querySelector('script[src="https://checkout.razorpay.com/v1/checkout.js"]')) {
+                const script = document.createElement('script');
+                script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+                script.async = true;
+                script.onload = () => {
+                  launchRazorpayCheckout(data);
+                };
+                document.body.appendChild(script);
+              } else {
+                launchRazorpayCheckout(data);
+              }
+            } else if (data && data.pay_link) {
+              window.open(data.pay_link, '_blank');
+            } else {
+              showError(t('未获取到 Razorpay 订单信息'));
+            }
           } else {
             // 普通支付表单提交
             let params = data;
@@ -468,6 +499,61 @@ const TopUp = () => {
       console.log(err);
     } finally {
       setAmountLoading(false);
+    }
+  };
+
+  const getRazorpayAmount = async (value) => {
+    if (value === undefined) {
+      value = topUpCount;
+    }
+    setAmountLoading(true);
+    try {
+      const res = await API.post('/api/user/razorpay/amount', {
+        amount: parseFloat(value),
+      });
+      if (res !== undefined) {
+        const { message, data } = res.data;
+        if (message === 'success') {
+          setAmount(parseFloat(data));
+        } else {
+          setAmount(0);
+          Toast.error({ content: '错误：' + data, id: 'getAmount' });
+        }
+      } else {
+        showError(res);
+      }
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setAmountLoading(false);
+    }
+  };
+
+  const launchRazorpayCheckout = (orderData) => {
+    try {
+      if (!window.Razorpay) {
+        showError(t('Razorpay 脚本尚未加载'));
+        return;
+      }
+      const options = {
+        key: 'RAZORPAY_KEY_ID_PLACEHOLDER', // replaced at runtime if you inline env
+        amount: orderData.amount,
+        currency: orderData.currency || 'INR',
+        name: 'Account Topup',
+        description: 'Recharge',
+        order_id: orderData.id,
+        handler: function (response) {
+          showSuccess(t('支付成功，等待到账'));
+        },
+        prefill: {},
+        notes: { source: 'one-api' },
+        theme: { color: '#3399cc' },
+      };
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+    } catch (e) {
+      console.error('Razorpay checkout error', e);
+      showError(t('Razorpay 启动失败'));
     }
   };
 
