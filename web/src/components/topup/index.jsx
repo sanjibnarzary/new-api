@@ -34,6 +34,7 @@ import { UserContext } from '../../context/User';
 import { StatusContext } from '../../context/Status';
 
 import RechargeCard from './RechargeCard';
+// ...existing code...
 import InvitationCard from './InvitationCard';
 import TransferModal from './modals/TransferModal';
 import PaymentConfirmModal from './modals/PaymentConfirmModal';
@@ -59,6 +60,9 @@ const TopUp = () => {
 
   const [enableStripeTopUp, setEnableStripeTopUp] = useState(
     statusState?.status?.enable_stripe_topup || false,
+  );
+  const [enableRazorpayTopUp, setEnableRazorpayTopUp] = useState(
+    statusState?.status?.enable_razorpay_topup || false,
   );
   const [statusLoading, setStatusLoading] = useState(true);
 
@@ -132,9 +136,18 @@ const TopUp = () => {
   };
 
   const preTopUp = async (payment) => {
-  if (payment === 'stripe' || payment === 'razorpay') {
+    if (payment === 'stripe') {
       if (!enableStripeTopUp) {
         showError(t('管理员未开启Stripe充值！'));
+        return;
+      }
+    } else if (payment === 'razorpay') {
+      if (!enableRazorpayTopUp) {
+        showError(t('管理员未开启Razorpay充值！'));
+        return;
+      }
+      if (topUpCount < 1) {
+        showError(t('Razorpay充值金额不能小于1'));
         return;
       }
     } else {
@@ -155,7 +168,7 @@ const TopUp = () => {
         await getAmount();
       }
 
-      if (topUpCount < minTopUp) {
+      if (payment !== 'razorpay' && topUpCount < minTopUp) {
         showError(t('充值数量不能小于') + minTopUp);
         return;
       }
@@ -177,6 +190,10 @@ const TopUp = () => {
       if (amount === 0) {
         await getRazorpayAmount();
       }
+      if (topUpCount < 1 {
+        showError('Razorpay充值金额不能小于1');
+        return;
+      }
     } else {
       // 普通支付处理
       if (amount === 0) {
@@ -184,7 +201,7 @@ const TopUp = () => {
       }
     }
 
-    if (topUpCount < minTopUp) {
+    if (payWay !== 'razorpay' && topUpCount < minTopUp) {
       showError('充值数量不能小于' + minTopUp);
       return;
     }
@@ -214,6 +231,9 @@ const TopUp = () => {
         const { message, data } = res.data;
         if (message === 'success') {
           if (payWay === 'stripe') {
+        const [enableRazorpayTopUp, setEnableRazorpayTopUp] = useState(
+          statusState?.status?.enable_razorpay_topup || false,
+        );
             // Stripe 支付回调处理
             window.open(data.pay_link, '_blank');
           } else if (payWay === 'razorpay') {
@@ -233,6 +253,10 @@ const TopUp = () => {
               }
             } else if (data && data.pay_link) {
               window.open(data.pay_link, '_blank');
+            if (!enableRazorpayTopUp) {
+              showError(t('管理员未开启Razorpay充值！'));
+              return;
+            }
             } else {
               showError(t('未获取到 Razorpay 订单信息'));
             }
@@ -272,6 +296,7 @@ const TopUp = () => {
     } finally {
       setOpen(false);
       setConfirmLoading(false);
+              enableRazorpayTopUp={enableRazorpayTopUp}
     }
   };
 
@@ -347,6 +372,7 @@ const TopUp = () => {
           const minTopUpValue = enableOnlineTopUp? data.min_topup : enableStripeTopUp? data.stripe_min_topup : 1;
           setEnableOnlineTopUp(enableOnlineTopUp);
           setEnableStripeTopUp(enableStripeTopUp);
+          setEnableRazorpayTopUp(data.enable_razorpay_topup || false);
           setMinTopUp(minTopUpValue);
           setTopUpCount(minTopUpValue);
 
@@ -446,6 +472,10 @@ const TopUp = () => {
   }, [statusState?.status]);
 
   const renderAmount = () => {
+    // Show INR for Razorpay, fallback to 元 for others
+    if (payWay === 'razorpay') {
+      return amount + ' ₹';
+    }
     return amount + ' ' + t('元');
   };
 
@@ -529,21 +559,46 @@ const TopUp = () => {
     }
   };
 
-  const launchRazorpayCheckout = (orderData) => {
+  const launchRazorpayCheckout = async (orderData) => {
     try {
       if (!window.Razorpay) {
         showError(t('Razorpay 脚本尚未加载'));
         return;
       }
+      // Fetch public key from backend
+      let keyId = 'RAZORPAY_KEY_ID_PLACEHOLDER';
+      try {
+        const res = await API.get('/api/user/razorpay/public_key');
+        if (res?.data?.message === 'success' && res.data.data?.key_id) {
+          keyId = res.data.data.key_id;
+        }
+      } catch (e) {
+        // fallback to placeholder
+      }
+      // Convert USD to INR (in paise) before checkout
+      // You may want to fetch the rate from backend or config
+      const inrToUsd = 98.0; // Should match backend config
+      const usdAmount = orderData.amount;
+      const inrAmount = usdAmount * inrToUsd;
+      const paiseAmount = Math.round(inrAmount * 100);
       const options = {
-        key: 'RAZORPAY_KEY_ID_PLACEHOLDER', // replaced at runtime if you inline env
-        amount: orderData.amount,
-        currency: orderData.currency || 'INR',
+        key: keyId,
+        amount: paiseAmount,
+        currency: 'INR',
         name: 'Account Topup',
         description: 'Recharge',
         order_id: orderData.id,
-        handler: function (response) {
+        handler: async function (response) {
           showSuccess(t('支付成功，等待到账'));
+          // Refresh user quota after payment
+          try {
+            const res = await API.get('/api/user/self');
+            if (res?.data?.success && res.data.data) {
+              userDispatch({ type: 'login', payload: res.data.data });
+            }
+          } catch (e) {
+            // ignore
+          }
         },
         prefill: {},
         notes: { source: 'one-api' },
@@ -630,6 +685,7 @@ const TopUp = () => {
               t={t}
               enableOnlineTopUp={enableOnlineTopUp}
               enableStripeTopUp={enableStripeTopUp}
+              enableRazorpayTopUp={enableRazorpayTopUp}
               presetAmounts={presetAmounts}
               selectedPreset={selectedPreset}
               selectPresetAmount={selectPresetAmount}

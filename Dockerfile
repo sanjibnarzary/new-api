@@ -17,7 +17,7 @@ ENV GO111MODULE=on \
 WORKDIR /build
 
 # Install git for go modules that require VCS (e.g., razorpay client)
-RUN apk add --no-cache git
+# RUN apk add --no-cache git
 
 ADD go.mod go.sum ./
 RUN go mod download

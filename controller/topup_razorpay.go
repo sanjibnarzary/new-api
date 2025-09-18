@@ -5,13 +5,13 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"one-api/common"
 	"one-api/model"
 	"one-api/setting"
-	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -28,7 +28,7 @@ const (
 var razorpayAdaptor = &RazorpayAdaptor{}
 
 type RazorpayPayRequest struct {
-	Amount        int64  `json:"amount"`
+	Amount        int64  `json:"amount"` // Accept USD amount from frontend
 	PaymentMethod string `json:"payment_method"`
 }
 
@@ -38,9 +38,6 @@ type RazorpayAdaptor struct {
 // Public key exposure for frontend (do not expose secret)
 func GetRazorpayPublicKey(c *gin.Context) {
 	keyID := setting.RazorpayKeyId
-	if keyID == "" { // fallback env
-		keyID = os.Getenv("RAZORPAY_KEY_ID")
-	}
 	if keyID == "" {
 		c.JSON(200, gin.H{"message": "error", "data": "Razorpay key not configured"})
 		return
@@ -49,69 +46,83 @@ func GetRazorpayPublicKey(c *gin.Context) {
 }
 
 func (*RazorpayAdaptor) RequestAmount(c *gin.Context, req *RazorpayPayRequest) {
-	if req.Amount < 100 {
-		c.JSON(200, gin.H{"message": "error", "data": "Top-up amount cannot be less than 100"})
-		return
-	}
-	// id := c.GetInt("id")
-	payMoney := float64(req.Amount)
-	if payMoney <= 0.01 {
-		c.JSON(200, gin.H{"message": "error", "data": "Top-up amount too low"})
-		return
-	}
-	c.JSON(200, gin.H{"message": "success", "data": strconv.FormatFloat(payMoney, 'f', 2, 64)})
+       // Convert USD to INR paise
+       usdToInrRate := setting.RazorpayInrToUsdRate
+       usdAmount := float64(req.Amount)
+       inr := usdAmount * usdToInrRate
+       paise := int64(inr * 100)
+       if paise < 10000 {
+	       c.JSON(200, gin.H{"message": "error", "data": "Top-up amount cannot be less than ₹100"})
+	       return
+       }
+       if paise > 1000000 {
+	       c.JSON(200, gin.H{"message": "error", "data": "Top-up amount cannot be greater than ₹10,000"})
+	       return
+       }
+       c.JSON(200, gin.H{"message": "success", "data": paise})
 }
 
 func (*RazorpayAdaptor) RequestPay(c *gin.Context, req *RazorpayPayRequest) {
-	if req.PaymentMethod != PaymentMethodRazorpay {
-		c.JSON(200, gin.H{"message": "error", "data": "Unsupported payment method"})
-		return
-	}
-	if req.Amount < 100 {
-		c.JSON(200, gin.H{"message": "error", "data": "Top-up amount cannot be less than 100"})
-		return
-	}
-	if req.Amount > 1000000 {
-		c.JSON(200, gin.H{"message": "error", "data": "Top-up amount cannot be greater than 1000000"})
-		return
-	}
+       if req.PaymentMethod != PaymentMethodRazorpay {
+	       c.JSON(200, gin.H{"message": "error", "data": "Unsupported payment method"})
+	       return
+       }
+       // Convert USD to INR paise
+       usdToInrRate := setting.RazorpayInrToUsdRate
+       usdAmount := float64(req.Amount)
+       inr := usdAmount * usdToInrRate
+       paise := int64(inr * 100)
+       if usdAmount < 1 {
+	       c.JSON(200, gin.H{"message": "error", "data": "Top-up amount cannot be less than $1"})
+	       return
+       }
+       if usdAmount > 100000 {
+	       c.JSON(200, gin.H{"message": "error", "data": "Top-up amount cannot be greater than $100,000"})
+	       return
+       }
 
-	id := c.GetInt("id")
-	chargedMoney := float64(req.Amount)
+       id := c.GetInt("id")
+       chargedMoney := float64(paise)
 
-	referenceId := "ref_" + strconv.FormatInt(time.Now().UnixNano(), 10)
+       referenceId := "ref_" + strconv.FormatInt(time.Now().UnixNano(), 10)
 
-	keyID := setting.RazorpayKeyId
-	if keyID == "" {
-		keyID = os.Getenv("RAZORPAY_KEY_ID")
-	}
-	keySecret := setting.RazorpayKeySecret
-	if keySecret == "" {
-		keySecret = os.Getenv("RAZORPAY_KEY_SECRET")
-	}
-	if keyID == "" || keySecret == "" {
-		c.JSON(200, gin.H{"message": "error", "data": "Razorpay keys not configured"})
-		return
-	}
-	client := razorpay.NewClient(keyID, keySecret)
-	data := map[string]interface{}{
-		"amount":   req.Amount, // Amount in paise
-		"currency": "INR",
-		"receipt":  referenceId,
-	}
+       keyID := setting.RazorpayKeyId
+       keySecret := setting.RazorpayKeySecret
+       if keyID == "" || keySecret == "" {
+	       c.JSON(200, gin.H{"message": "error", "data": "Razorpay keys not configured"})
+	       return
+       }
+       client := razorpay.NewClient(keyID, keySecret)
+       data := map[string]interface{}{
+	       "amount":   paise, // Amount in paise
+	       "currency": "INR",
+	       "receipt":  referenceId,
+       }
 
-	body, err := client.Order.Create(data, nil)
-	if err != nil {
-		log.Printf("Error creating Razorpay order: %v", err)
-		c.JSON(200, gin.H{"message": "error", "data": "Failed to create order"})
-		return
-	}
+       body, err := client.Order.Create(data, nil)
+       if err != nil {
+	       log.Printf("Error creating Razorpay order: %v", err)
+	       c.JSON(200, gin.H{"message": "error", "data": "Failed to create order"})
+	       return
+       }
 
+	// Use Razorpay order ID for TradeNo to match webhook
+	razorpayOrderID := ""
+	if body != nil {
+		if idVal, ok := body["id"]; ok {
+			if s, ok := idVal.(string); ok {
+				razorpayOrderID = s
+			}
+		}
+	}
+	if razorpayOrderID == "" {
+		razorpayOrderID = referenceId // fallback
+	}
 	topUp := &model.TopUp{
 		UserId:     id,
 		Amount:     req.Amount,
 		Money:      chargedMoney,
-		TradeNo:    referenceId,
+		TradeNo:    razorpayOrderID,
 		CreateTime: time.Now().Unix(),
 		Status:     common.TopUpStatusPending,
 	}
@@ -192,7 +203,14 @@ func RazorpayWebhook(c *gin.Context) {
 				log.Printf("Razorpay topup order already processed: %s status=%s", orderID, topUp.Status)
 			} else {
 				// Mark success and credit quota similar to Recharge but w/out customer id
-				quota := topUp.Money * common.QuotaPerUnit
+				// Razorpay collects in paise, convert to INR, then to USD for quota
+				inrToUsd := setting.RazorpayInrToUsdRate
+				if inrToUsd <= 0 {
+					inrToUsd = 83.0 // fallback default
+				}
+				inrAmount := topUp.Money / 100.0 // Money is in paise, convert to INR
+				usdAmount := inrAmount / inrToUsd
+				quota := usdAmount * common.QuotaPerUnit
 				topUp.CompleteTime = common.GetTimestamp()
 				topUp.Status = common.TopUpStatusSuccess
 				if err := model.DB.Save(topUp).Error; err != nil {
@@ -202,7 +220,40 @@ func RazorpayWebhook(c *gin.Context) {
 						log.Printf("Failed crediting user quota for Razorpay topup: %s err=%v", orderID, err)
 					} else {
 						model.RecordLog(topUp.UserId, model.LogTypeTopup, "Razorpay recharge success")
-						log.Printf("Razorpay payment captured: order=%s quota=%.2f", orderID, quota)
+						// Add detailed Razorpay payment log to database
+						model.RecordLog(topUp.UserId, model.LogTypeTopup, fmt.Sprintf("[Razorpay] Payment successful: order=%s user=%d amount=%.2f quota=%.2f", orderID, topUp.UserId, topUp.Money, quota))
+						log.Printf("[Razorpay] Payment successful: order=%s user=%d amount=%.2f quota=%.2f", orderID, topUp.UserId, topUp.Money, quota)
+					}
+				}
+			}
+		}
+	} else if etype == "payment.authorized" {
+		// Extract order id from payload: payload["payment"].(map)["entity"].(map)["order_id"]
+		paymentObj, _ := event["payload"].(map[string]any)["payment"].(map[string]any)
+		entity, _ := paymentObj["entity"].(map[string]any)
+		orderID, _ := entity["order_id"].(string)
+		if orderID != "" {
+			topUp := model.GetTopUpByTradeNo(orderID)
+			if topUp != nil && topUp.Status == common.TopUpStatusPending {
+				// Razorpay collects in paise, convert to INR, then to USD for quota
+				inrToUsd := setting.RazorpayInrToUsdRate
+				if inrToUsd <= 0 {
+					inrToUsd = 83.0 // fallback default
+				}
+				inrAmount := topUp.Money / 100.0 // Money is in paise, convert to INR
+				usdAmount := inrAmount / inrToUsd
+				quota := usdAmount * common.QuotaPerUnit
+				topUp.CompleteTime = common.GetTimestamp()
+				topUp.Status = common.TopUpStatusSuccess
+				if err := model.DB.Save(topUp).Error; err != nil {
+					log.Printf("Failed updating Razorpay topup: %s err=%v", orderID, err)
+				} else {
+					if err := model.DB.Model(&model.User{}).Where("id = ?", topUp.UserId).Update("quota", gorm.Expr("quota + ?", quota)).Error; err != nil {
+						log.Printf("Failed crediting user quota for Razorpay topup: %s err=%v", orderID, err)
+					} else {
+						model.RecordLog(topUp.UserId, model.LogTypeTopup, "Razorpay recharge success (authorized)")
+						model.RecordLog(topUp.UserId, model.LogTypeTopup, fmt.Sprintf("使用在线充值成功，充值金额: ＄%.6f，支付金额：%.0f", usdAmount, inrAmount))
+						log.Printf("[Razorpay] Payment authorized & quota updated: order=%s user=%d amount=%.2f quota=%.2f", orderID, topUp.UserId, topUp.Money, quota)
 					}
 				}
 			}
