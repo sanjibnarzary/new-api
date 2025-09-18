@@ -177,9 +177,9 @@ const Home = () => {
                       </>
                     ) : (
                       <>
-                        统一的
+                        एकीकृत
                         <br />
-                        <span className='shine-text'>大模型接口网关</span>
+                        <span className='shine-text'>एलएलएम एपीआई गेटवे</span>
                       </>
                     )}
                   </h1>

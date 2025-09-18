@@ -2,7 +2,7 @@
 
 services:
   new-api:
-    image: ghcr.io/sanjibnarzary/new-api:v0.2.5
+    image: ghcr.io/sanjibnarzary/new-api:v0.2.8-indic-rp-arm
     #platform: linux/arm64/v8
     container_name: new-api
     restart: always
