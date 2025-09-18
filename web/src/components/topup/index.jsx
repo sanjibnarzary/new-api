@@ -190,7 +190,7 @@ const TopUp = () => {
       if (amount === 0) {
         await getRazorpayAmount();
       }
-      if (topUpCount < 1 {
+      if (topUpCount < 1) {
         showError('Razorpay充值金额不能小于1');
         return;
       }
@@ -474,7 +474,8 @@ const TopUp = () => {
   const renderAmount = () => {
     // Show INR for Razorpay, fallback to 元 for others
     if (payWay === 'razorpay') {
-      return amount + ' ₹';
+      const inrAmount = amount / 100;
+      return inrAmount + ' ₹';
     }
     return amount + ' ' + t('元');
   };
