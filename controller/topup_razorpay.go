@@ -46,65 +46,65 @@ func GetRazorpayPublicKey(c *gin.Context) {
 }
 
 func (*RazorpayAdaptor) RequestAmount(c *gin.Context, req *RazorpayPayRequest) {
-       // Convert USD to INR paise
-       usdToInrRate := setting.RazorpayInrToUsdRate
-       usdAmount := float64(req.Amount)
-       inr := usdAmount * usdToInrRate
-       paise := int64(inr * 100)
-       if paise < 10000 {
-	       c.JSON(200, gin.H{"message": "error", "data": "Top-up amount cannot be less than ₹100"})
-	       return
-       }
-       if paise > 1000000 {
-	       c.JSON(200, gin.H{"message": "error", "data": "Top-up amount cannot be greater than ₹10,000"})
-	       return
-       }
-       c.JSON(200, gin.H{"message": "success", "data": paise})
+	// Convert USD to INR paise
+	usdToInrRate := setting.RazorpayInrToUsdRate
+	usdAmount := float64(req.Amount)
+	inr := usdAmount * usdToInrRate
+	paise := int64(inr * 100)
+	if paise < 10000 {
+		c.JSON(200, gin.H{"message": "error", "data": "Top-up amount cannot be less than ₹100"})
+		return
+	}
+	if paise > 10000000 {
+		c.JSON(200, gin.H{"message": "error", "data": "Top-up amount cannot be greater than ₹10,000"})
+		return
+	}
+	c.JSON(200, gin.H{"message": "success", "data": paise})
 }
 
 func (*RazorpayAdaptor) RequestPay(c *gin.Context, req *RazorpayPayRequest) {
-       if req.PaymentMethod != PaymentMethodRazorpay {
-	       c.JSON(200, gin.H{"message": "error", "data": "Unsupported payment method"})
-	       return
-       }
-       // Convert USD to INR paise
-       usdToInrRate := setting.RazorpayInrToUsdRate
-       usdAmount := float64(req.Amount)
-       inr := usdAmount * usdToInrRate
-       paise := int64(inr * 100)
-       if usdAmount < 1 {
-	       c.JSON(200, gin.H{"message": "error", "data": "Top-up amount cannot be less than $1"})
-	       return
-       }
-       if usdAmount > 100000 {
-	       c.JSON(200, gin.H{"message": "error", "data": "Top-up amount cannot be greater than $100,000"})
-	       return
-       }
+	if req.PaymentMethod != PaymentMethodRazorpay {
+		c.JSON(200, gin.H{"message": "error", "data": "Unsupported payment method"})
+		return
+	}
+	// Convert USD to INR paise
+	usdToInrRate := setting.RazorpayInrToUsdRate
+	usdAmount := float64(req.Amount)
+	inr := usdAmount * usdToInrRate
+	paise := int64(inr * 100)
+	if usdAmount < 1 {
+		c.JSON(200, gin.H{"message": "error", "data": "Top-up amount cannot be less than $1"})
+		return
+	}
+	if usdAmount > 100000000 {
+		c.JSON(200, gin.H{"message": "error", "data": "Top-up amount cannot be greater than $100,000"})
+		return
+	}
 
-       id := c.GetInt("id")
-       chargedMoney := float64(paise)
+	id := c.GetInt("id")
+	chargedMoney := float64(paise)
 
-       referenceId := "ref_" + strconv.FormatInt(time.Now().UnixNano(), 10)
+	referenceId := "ref_" + strconv.FormatInt(time.Now().UnixNano(), 10)
 
-       keyID := setting.RazorpayKeyId
-       keySecret := setting.RazorpayKeySecret
-       if keyID == "" || keySecret == "" {
-	       c.JSON(200, gin.H{"message": "error", "data": "Razorpay keys not configured"})
-	       return
-       }
-       client := razorpay.NewClient(keyID, keySecret)
-       data := map[string]interface{}{
-	       "amount":   paise, // Amount in paise
-	       "currency": "INR",
-	       "receipt":  referenceId,
-       }
+	keyID := setting.RazorpayKeyId
+	keySecret := setting.RazorpayKeySecret
+	if keyID == "" || keySecret == "" {
+		c.JSON(200, gin.H{"message": "error", "data": "Razorpay keys not configured"})
+		return
+	}
+	client := razorpay.NewClient(keyID, keySecret)
+	data := map[string]interface{}{
+		"amount":   paise, // Amount in paise
+		"currency": "INR",
+		"receipt":  referenceId,
+	}
 
-       body, err := client.Order.Create(data, nil)
-       if err != nil {
-	       log.Printf("Error creating Razorpay order: %v", err)
-	       c.JSON(200, gin.H{"message": "error", "data": "Failed to create order"})
-	       return
-       }
+	body, err := client.Order.Create(data, nil)
+	if err != nil {
+		log.Printf("Error creating Razorpay order: %v", err)
+		c.JSON(200, gin.H{"message": "error", "data": "Failed to create order"})
+		return
+	}
 
 	// Use Razorpay order ID for TradeNo to match webhook
 	razorpayOrderID := ""
