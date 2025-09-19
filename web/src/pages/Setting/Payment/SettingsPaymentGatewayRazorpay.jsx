@@ -14,6 +14,7 @@ export default function SettingsPaymentGatewayRazorpay(props) {
     RazorpayKeyId: '',
     RazorpayKeySecret: '',
     RazorpayWebhookSecret: '',
+    RazorpayInrToUsdRate: '',
   });
   const formApiRef = useRef(null);
 
@@ -23,6 +24,7 @@ export default function SettingsPaymentGatewayRazorpay(props) {
         RazorpayKeyId: props.options.RazorpayKeyId || '',
         RazorpayKeySecret: props.options.RazorpayKeySecret || '',
         RazorpayWebhookSecret: props.options.RazorpayWebhookSecret || '',
+        RazorpayInrToUsdRate: props.options.RazorpayInrToUsdRate || '',
       };
       setInputs(currentInputs);
       formApiRef.current.setValues(currentInputs);
@@ -49,6 +51,9 @@ export default function SettingsPaymentGatewayRazorpay(props) {
       }
       if (inputs.RazorpayWebhookSecret) {
         options.push({ key: 'RazorpayWebhookSecret', value: inputs.RazorpayWebhookSecret });
+      }
+      if (inputs.RazorpayInrToUsdRate) {
+        options.push({ key: 'RazorpayInrToUsdRate', value: inputs.RazorpayInrToUsdRate });
       }
       const results = await Promise.all(options.map(opt => API.put('/api/option/', opt)));
       const errorResults = results.filter(r => !r.data.success);
@@ -77,14 +82,17 @@ export default function SettingsPaymentGatewayRazorpay(props) {
           <Banner type='info' description={`Webhook URL: ${props.options.ServerAddress ? removeTrailingSlash(props.options.ServerAddress) : t('网站地址')}/api/razorpay/webhook`} />
           <Banner type='warning' description={t('确保启用 payment.captured 事件')} />
           <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 24, xl: 24, xxl: 24 }}>
-            <Col xs={24} sm={24} md={8} lg={8} xl={8}>
+            <Col xs={24} sm={24} md={6} lg={6} xl={6}>
               <Form.Input field='RazorpayKeyId' label={t('Key Id')} placeholder={t('Razorpay Key Id，敏感信息不显示')} type='password' />
             </Col>
-            <Col xs={24} sm={24} md={8} lg={8} xl={8}>
+            <Col xs={24} sm={24} md={6} lg={6} xl={6}>
               <Form.Input field='RazorpayKeySecret' label={t('Key Secret')} placeholder={t('Razorpay Key Secret，敏感信息不显示')} type='password' />
             </Col>
-            <Col xs={24} sm={24} md={8} lg={8} xl={8}>
+            <Col xs={24} sm={24} md={6} lg={6} xl={6}>
               <Form.Input field='RazorpayWebhookSecret' label={t('Webhook 密钥')} placeholder={t('Webhook Secret，敏感信息不显示')} type='password' />
+            </Col>
+            <Col xs={24} sm={24} md={6} lg={6} xl={6}>
+              <Form.Input field='RazorpayInrToUsdRate' label={t('INR to USD Rate')} placeholder={t('Example: 83.0')} type='number' />
             </Col>
           </Row>
           <Button onClick={submitRazorpaySetting}>{t('更新 Razorpay 设置')}</Button>

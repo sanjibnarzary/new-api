@@ -188,6 +188,156 @@ func UpdateOption(key string, value string) error {
 }
 
 func updateOptionMap(key string, value string) (err error) {
+	// ...existing code...
+	switch key {
+	case "EmailDomainWhitelist":
+		common.EmailDomainWhitelist = strings.Split(value, ",")
+	case "SMTPServer":
+		common.SMTPServer = value
+	case "SMTPPort":
+		intValue, _ := strconv.Atoi(value)
+		common.SMTPPort = intValue
+	case "SMTPAccount":
+		common.SMTPAccount = value
+	case "SMTPFrom":
+		common.SMTPFrom = value
+	case "SMTPToken":
+		common.SMTPToken = value
+	case "ServerAddress":
+		system_setting.ServerAddress = value
+	case "WorkerUrl":
+		system_setting.WorkerUrl = value
+	case "WorkerValidKey":
+		system_setting.WorkerValidKey = value
+	case "PayAddress":
+		operation_setting.PayAddress = value
+	case "Chats":
+		err = setting.UpdateChatsByJsonString(value)
+	case "AutoGroups":
+		err = setting.UpdateAutoGroupsByJsonString(value)
+	case "CustomCallbackAddress":
+		operation_setting.CustomCallbackAddress = value
+	case "EpayId":
+		operation_setting.EpayId = value
+	case "EpayKey":
+		operation_setting.EpayKey = value
+	case "Price":
+		operation_setting.Price, _ = strconv.ParseFloat(value, 64)
+	case "USDExchangeRate":
+		operation_setting.USDExchangeRate, _ = strconv.ParseFloat(value, 64)
+	case "MinTopUp":
+		operation_setting.MinTopUp, _ = strconv.Atoi(value)
+	case "StripeApiSecret":
+		setting.StripeApiSecret = value
+	case "StripeWebhookSecret":
+		setting.StripeWebhookSecret = value
+	case "StripePriceId":
+		setting.StripePriceId = value
+	case "StripeUnitPrice":
+		setting.StripeUnitPrice, _ = strconv.ParseFloat(value, 64)
+	case "StripeMinTopUp":
+		setting.StripeMinTopUp, _ = strconv.Atoi(value)
+	case "CreemApiKey":
+		setting.CreemApiKey = value
+	case "CreemProducts":
+		setting.CreemProducts = value
+	case "CreemTestMode":
+		setting.CreemTestMode = value == "true"
+	case "CreemWebhookSecret":
+		setting.CreemWebhookSecret = value
+	case "RazorpayWebhookSecret":
+		setting.RazorpayWebhookSecret = value
+	case "RazorpayKeyId":
+		setting.RazorpayKeyId = value
+	case "RazorpayKeySecret":
+		setting.RazorpayKeySecret = value
+	case "RazorpayInrToUsdRate":
+		setting.RazorpayInrToUsdRate, _ = strconv.ParseFloat(value, 64)
+	case "TopupGroupRatio":
+		err = common.UpdateTopupGroupRatioByJSONString(value)
+	case "GitHubClientId":
+		common.GitHubClientId = value
+	case "GitHubClientSecret":
+		common.GitHubClientSecret = value
+	case "LinuxDOClientId":
+		common.LinuxDOClientId = value
+	case "LinuxDOClientSecret":
+		common.LinuxDOClientSecret = value
+	case "LinuxDOMinimumTrustLevel":
+		common.LinuxDOMinimumTrustLevel, _ = strconv.Atoi(value)
+	case "Footer":
+		common.Footer = value
+	case "SystemName":
+		common.SystemName = value
+	case "Logo":
+		common.Logo = value
+	case "WeChatServerAddress":
+		common.WeChatServerAddress = value
+	case "WeChatServerToken":
+		common.WeChatServerToken = value
+	case "WeChatAccountQRCodeImageURL":
+		common.WeChatAccountQRCodeImageURL = value
+	case "TelegramBotToken":
+		common.TelegramBotToken = value
+	case "TelegramBotName":
+		common.TelegramBotName = value
+	case "TurnstileSiteKey":
+		common.TurnstileSiteKey = value
+	case "TurnstileSecretKey":
+		common.TurnstileSecretKey = value
+	case "QuotaForNewUser":
+		common.QuotaForNewUser, _ = strconv.Atoi(value)
+	case "QuotaForInviter":
+		common.QuotaForInviter, _ = strconv.Atoi(value)
+	case "QuotaForInvitee":
+		common.QuotaForInvitee, _ = strconv.Atoi(value)
+	case "QuotaRemindThreshold":
+		common.QuotaRemindThreshold, _ = strconv.Atoi(value)
+	case "PreConsumedQuota":
+		common.PreConsumedQuota, _ = strconv.Atoi(value)
+	case "ModelRequestRateLimitCount":
+		setting.ModelRequestRateLimitCount, _ = strconv.Atoi(value)
+	case "ModelRequestRateLimitDurationMinutes":
+		setting.ModelRequestRateLimitDurationMinutes, _ = strconv.Atoi(value)
+	case "ModelRequestRateLimitSuccessCount":
+		setting.ModelRequestRateLimitSuccessCount, _ = strconv.Atoi(value)
+	case "ModelRequestRateLimitGroup":
+		err = setting.UpdateModelRequestRateLimitGroupByJSONString(value)
+	case "RetryTimes":
+		common.RetryTimes, _ = strconv.Atoi(value)
+	case "DataExportInterval":
+		common.DataExportInterval, _ = strconv.Atoi(value)
+	case "DataExportDefaultTime":
+		common.DataExportDefaultTime = value
+	case "ModelRatio":
+		err = ratio_setting.UpdateModelRatioByJSONString(value)
+	case "GroupRatio":
+		err = ratio_setting.UpdateGroupRatioByJSONString(value)
+	case "GroupGroupRatio":
+		err = ratio_setting.UpdateGroupGroupRatioByJSONString(value)
+	case "UserUsableGroups":
+		err = setting.UpdateUserUsableGroupsByJSONString(value)
+	case "CompletionRatio":
+		err = ratio_setting.UpdateCompletionRatioByJSONString(value)
+	case "ModelPrice":
+		err = ratio_setting.UpdateModelPriceByJSONString(value)
+	case "CacheRatio":
+		err = ratio_setting.UpdateCacheRatioByJSONString(value)
+	case "TopUpLink":
+		common.TopUpLink = value
+	case "ChannelDisableThreshold":
+		common.ChannelDisableThreshold, _ = strconv.ParseFloat(value, 64)
+	case "QuotaPerUnit":
+		common.QuotaPerUnit, _ = strconv.ParseFloat(value, 64)
+	case "SensitiveWords":
+		setting.SensitiveWordsFromString(value)
+	case "AutomaticDisableKeywords":
+		operation_setting.AutomaticDisableKeywordsFromString(value)
+	case "StreamCacheQueueLength":
+		setting.StreamCacheQueueLength, _ = strconv.Atoi(value)
+	case "PayMethods":
+		err = operation_setting.UpdatePayMethodsByJsonString(value)
+	}
 	common.OptionMapRWMutex.Lock()
 	defer common.OptionMapRWMutex.Unlock()
 	common.OptionMap[key] = value

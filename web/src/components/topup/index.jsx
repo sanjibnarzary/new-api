@@ -17,7 +17,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 
-import React, { useEffect, useState, useContext, useRef } from 'react';
+import React, { useEffect, useState, useContext, useRef, use } from 'react';
 import {
   API,
   showError,
@@ -221,7 +221,7 @@ const TopUp = () => {
         });
       } else {
         // 普通支付请求
-        res = await API.post('/api/user/pay', {
+        res = await API.post('/api/user/razorpay/pay', {
           amount: parseInt(topUpCount),
           payment_method: payWay,
         });
@@ -470,14 +470,21 @@ const TopUp = () => {
       setStatusLoading(false);
     }
   }, [statusState?.status]);
-
+ 
+  //set payWay to razorpay for testing
+  useEffect(() => {
+    setPayWay('razorpay');
+  }, []);
+   
   const renderAmount = () => {
     // Show INR for Razorpay, fallback to 元 for others
-    if (payWay === 'razorpay') {
-      const inrAmount = amount / 100;
-      return inrAmount + ' ₹';
-    }
-    return amount + ' ' + t('元');
+    // if (payWay === 'stripe') {
+    //   // amount is already in INR (not paise)
+    //   return amount + ' ' + t('元');
+    // }
+    //{(Number(renderAmount()) / 100).toFixed(2)}
+    
+    return Number(amount / 100).toFixed(2) + ' ₹';
   };
 
   const getAmount = async (value) => {
@@ -486,7 +493,7 @@ const TopUp = () => {
     }
     setAmountLoading(true);
     try {
-      const res = await API.post('/api/user/amount', {
+      const res = await API.post('/api/user/razorpay/amount', {
         amount: parseFloat(value),
       });
       if (res !== undefined) {
@@ -495,7 +502,7 @@ const TopUp = () => {
           setAmount(parseFloat(data));
         } else {
           setAmount(0);
-          Toast.error({ content: '错误：' + data, id: 'getAmount' });
+          Toast.error({ content: t('错误：') + data, id: 'getAmount' });
         }
       } else {
         showError(res);
@@ -521,7 +528,7 @@ const TopUp = () => {
           setAmount(parseFloat(data));
         } else {
           setAmount(0);
-          Toast.error({ content: '错误：' + data, id: 'getAmount' });
+          Toast.error({ content: t('错误：') + data, id: 'getAmount' });
         }
       } else {
         showError(res);
@@ -548,7 +555,7 @@ const TopUp = () => {
           setAmount(parseFloat(data));
         } else {
           setAmount(0);
-          Toast.error({ content: '错误：' + data, id: 'getAmount' });
+          Toast.error({ content: t('错误：') + data, id: 'getAmount' });
         }
       } else {
         showError(res);
@@ -567,7 +574,8 @@ const TopUp = () => {
         return;
       }
       // Fetch public key from backend
-      let keyId = 'RAZORPAY_KEY_ID_PLACEHOLDER';
+      // Get RazorpayKeyId from payment settings if available
+      let keyId = statusState?.status?.payment_settings?.RazorpayKeyId || '';
       try {
         const res = await API.get('/api/user/razorpay/public_key');
         if (res?.data?.message === 'success' && res.data.data?.key_id) {
@@ -578,7 +586,8 @@ const TopUp = () => {
       }
       // Convert USD to INR (in paise) before checkout
       // You may want to fetch the rate from backend or config
-      const inrToUsd = 98.0; // Should match backend config
+      // Get INR/USD rate from backend settings if available
+      const inrToUsd = statusState?.status?.inr_to_usd || 98.0;
       const usdAmount = orderData.amount;
       const inrAmount = usdAmount * inrToUsd;
       const paiseAmount = Math.round(inrAmount * 100);

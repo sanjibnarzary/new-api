@@ -216,7 +216,7 @@ const RechargeCard = ({
                     <Col xs={24} sm={24} md={24} lg={10} xl={10}>
                       <Form.InputNumber
                         field='topUpCount'
-                        label={t('充值数量')}
+                        label={t('充值数量')+'($)'}
                         disabled={!enableOnlineTopUp && !enableStripeTopUp}
                         placeholder={
                           t('充值数量，最低 ') + renderQuotaWithAmount(minTopUp)
@@ -263,7 +263,7 @@ const RechargeCard = ({
                               <span style={{ color: 'red' }}>
                                 {/* Show INR equivalent for Razorpay payments, replacing CNY */}
                                 {enableRazorpayTopUp
-                                  ? `₹${renderAmount()}`
+                                  ? `${renderAmount()}`
                                   : renderAmount()}
                               </span>
                             </Text>
@@ -275,43 +275,25 @@ const RechargeCard = ({
                     <Col xs={24} sm={24} md={24} lg={14} xl={14}>
                       <Form.Slot label={t('选择支付方式')}>
                         <Space wrap>
+                          {/* disable payMethods */}
                           {payMethods && payMethods.length > 0 && payMethods.map((payMethod) => {
-                            const minTopupVal = Number(payMethod.min_topup) || 0;
-                            const isStripe = payMethod.type === 'stripe';
                             const isRazorpay = payMethod.type === 'razorpay';
-                            const disabled =
-                              (!enableOnlineTopUp && !isStripe && !isRazorpay) ||
-                              (!enableStripeTopUp && isStripe) ||
-                              (!enableRazorpayTopUp && isRazorpay) ||
-                              minTopupVal > Number(topUpCount || 0);
+                            if (!isRazorpay) return null;
+                            const minTopupVal = Number(payMethod.min_topup) || 0;
+                            const disabled = minTopupVal > Number(topUpCount || 0);
 
                             const buttonEl = (
                               <Button
                                 key={payMethod.type}
-                                theme={isRazorpay && enableRazorpayTopUp ? 'solid' : 'outline'}
+                                theme='solid'
                                 type='tertiary'
                                 onClick={() => preTopUp(payMethod.type)}
                                 disabled={disabled}
                                 loading={paymentLoading && payWay === payMethod.type}
-                                icon={
-                                  payMethod.type === 'alipay' ? (
-                                    <SiAlipay size={18} color='#1677FF' />
-                                  ) : payMethod.type === 'wxpay' ? (
-                                    <SiWechat size={18} color='#07C160' />
-                                  ) : payMethod.type === 'stripe' ? (
-                                    <SiStripe size={18} color='#635BFF' />
-                                  ) : isRazorpay ? (
-                                    <CreditCard size={18} color='#F5B041' />
-                                  ) : (
-                                    <CreditCard
-                                      size={18}
-                                      color={payMethod.color || 'var(--semi-color-text-2)'}
-                                    />
-                                  )
-                                }
-                                className={`!rounded-lg !px-4 !py-2 ${isRazorpay && enableRazorpayTopUp ? '!border-2 !border-yellow-500' : ''}`}
+                                icon={<CreditCard size={18} color='#F5B041' />}
+                                className='!rounded-lg !px-4 !py-2 !border-2 !border-yellow-500'
                               >
-                                {isRazorpay ? t('Razorpay') : payMethod.name}
+                                {t('Pay with Razorpay')}
                               </Button>
                             );
 
@@ -323,6 +305,7 @@ const RechargeCard = ({
                               <React.Fragment key={payMethod.type}>{buttonEl}</React.Fragment>
                             );
                           })}
+                          
                           {/* Razorpay fallback button if not in payMethods but enabled */}
                           {(!payMethods || !payMethods.some(m => m.type === 'razorpay')) && enableRazorpayTopUp && (
                             <Button
