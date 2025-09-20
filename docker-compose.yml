@@ -3,7 +3,7 @@
 services:
   new-api:
     #image: ghcr.io/sanjibnarzary/new-api:v0.2.8-indic-rp-arm
-    image: newapi-test:v0.0.1
+    image: docker.io/library/seekgpt-new-api:v0.3.1-mac-test
     #platform: linux/arm64/v8
     container_name: new-api
     restart: always

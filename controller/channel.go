@@ -209,7 +209,7 @@ func FetchUpstreamModels(c *gin.Context) {
 	if err = json.Unmarshal(body, &result); err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"success": false,
-			"message": fmt.Sprintf("解析响应失败: %s", err.Error()),
+			"message": fmt.Sprintf("Failed to parse response: %s", err.Error()),
 		})
 		return
 	}
@@ -381,7 +381,7 @@ func GetChannel(c *gin.Context) {
 	return
 }
 
-// GetChannelKey 验证2FA后获取渠道密钥
+// GetChannelKey retrieves the channel key after 2FA verification
 func GetChannelKey(c *gin.Context) {
 	type GetChannelKeyRequest struct {
 		Code string `json:"code" binding:"required"`
@@ -389,70 +389,70 @@ func GetChannelKey(c *gin.Context) {
 
 	var req GetChannelKeyRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		common.ApiError(c, fmt.Errorf("参数错误: %v", err))
+		common.ApiError(c, fmt.Errorf("Parameter error: %v", err))
 		return
 	}
 
 	userId := c.GetInt("id")
 	channelId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		common.ApiError(c, fmt.Errorf("渠道ID格式错误: %v", err))
+		common.ApiError(c, fmt.Errorf("Channel ID format error: %v", err))
 		return
 	}
 
-	// 获取2FA记录并验证
+	// Get 2FA record and verify
 	twoFA, err := model.GetTwoFAByUserId(userId)
 	if err != nil {
-		common.ApiError(c, fmt.Errorf("获取2FA信息失败: %v", err))
+		common.ApiError(c, fmt.Errorf("Failed to get 2FA info: %v", err))
 		return
 	}
 
 	if twoFA == nil || !twoFA.IsEnabled {
-		common.ApiError(c, fmt.Errorf("用户未启用2FA，无法查看密钥"))
+		common.ApiError(c, fmt.Errorf("User has not enabled 2FA, cannot view key"))
 		return
 	}
 
-	// 统一的2FA验证逻辑
+	// Unified 2FA verification logic
 	if !validateTwoFactorAuth(twoFA, req.Code) {
-		common.ApiError(c, fmt.Errorf("验证码或备用码错误，请重试"))
+		common.ApiError(c, fmt.Errorf("Verification code or backup code error, please try again"))
 		return
 	}
 
-	// 获取渠道信息（包含密钥）
+	// Get channel info (including key)
 	channel, err := model.GetChannelById(channelId, true)
 	if err != nil {
-		common.ApiError(c, fmt.Errorf("获取渠道信息失败: %v", err))
+		common.ApiError(c, fmt.Errorf("Failed to get channel info: %v", err))
 		return
 	}
 
 	if channel == nil {
-		common.ApiError(c, fmt.Errorf("渠道不存在"))
+		common.ApiError(c, fmt.Errorf("Channel does not exist"))
 		return
 	}
 
-	// 记录操作日志
-	model.RecordLog(userId, model.LogTypeSystem, fmt.Sprintf("查看渠道密钥信息 (渠道ID: %d)", channelId))
+	// Record operation log
+	model.RecordLog(userId, model.LogTypeSystem, fmt.Sprintf("View channel key info (Channel ID: %d)", channelId))
 
-	// 统一的成功响应格式
+	// Unified success response format
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
-		"message": "验证成功",
+		"message": "Verification successful",
 		"data": map[string]interface{}{
 			"key": channel.Key,
 		},
 	})
 }
 
-// validateTwoFactorAuth 统一的2FA验证函数
+// validateTwoFactorAuth unified 2FA verification function
 func validateTwoFactorAuth(twoFA *model.TwoFA, code string) bool {
-	// 尝试验证TOTP
+	// Try to verify TOTP
 	if cleanCode, err := common.ValidateNumericCode(code); err == nil {
 		if isValid, _ := twoFA.ValidateTOTPAndUpdateUsage(cleanCode); isValid {
 			return true
 		}
 	}
 
-	// 尝试验证备用码
+	// Try to verify backup code
 	if isValid, err := twoFA.ValidateBackupCodeAndUpdateUsage(code); err == nil && isValid {
 		return true
 	}
@@ -460,40 +460,40 @@ func validateTwoFactorAuth(twoFA *model.TwoFA, code string) bool {
 	return false
 }
 
-// validateChannel 通用的渠道校验函数
+// validateChannel general channel validation function
 func validateChannel(channel *model.Channel, isAdd bool) error {
-	// 校验 channel settings
+	// Validate channel settings
 	if err := channel.ValidateSettings(); err != nil {
-		return fmt.Errorf("渠道额外设置[channel setting] 格式错误：%s", err.Error())
+		return fmt.Errorf("Channel extra settings [channel setting] format error: %s", err.Error())
 	}
 
-	// 如果是添加操作，检查 channel 和 key 是否为空
+	// If adding, check channel and key are not empty
 	if isAdd {
 		if channel == nil || channel.Key == "" {
 			return fmt.Errorf("channel cannot be empty")
 		}
 
-		// 检查模型名称长度是否超过 255
+		// Check model name length does not exceed 255
 		for _, m := range channel.GetModels() {
 			if len(m) > 255 {
-				return fmt.Errorf("模型名称过长: %s", m)
+				return fmt.Errorf("model name too long: %s", m)
 			}
 		}
 	}
 
-	// VertexAI 特殊校验
+	// VertexAI special validation
 	if channel.Type == constant.ChannelTypeVertexAi {
 		if channel.Other == "" {
-			return fmt.Errorf("部署地区不能为空")
+			return fmt.Errorf("deployment region cannot be empty")
 		}
 
 		regionMap, err := common.StrToMap(channel.Other)
 		if err != nil {
-			return fmt.Errorf("部署地区必须是标准的Json格式，例如{\"default\": \"us-central1\", \"region2\": \"us-east1\"}")
+			return fmt.Errorf("deployment region must be standard Json format, e.g. {\"default\": \"us-central1\", \"region2\": \"us-east1\"}")
 		}
 
 		if regionMap["default"] == nil {
-			return fmt.Errorf("部署地区必须包含default字段")
+			return fmt.Errorf("deployment region must contain default field")
 		}
 	}
 
@@ -501,9 +501,10 @@ func validateChannel(channel *model.Channel, isAdd bool) error {
 }
 
 type AddChannelRequest struct {
-	Mode         string                `json:"mode"`
-	MultiKeyMode constant.MultiKeyMode `json:"multi_key_mode"`
-	Channel      *model.Channel        `json:"channel"`
+	Mode                      string                `json:"mode"`
+	MultiKeyMode              constant.MultiKeyMode `json:"multi_key_mode"`
+	BatchAddSetKeyPrefix2Name bool                  `json:"batch_add_set_key_prefix_2_name"`
+	Channel                   *model.Channel        `json:"channel"`
 }
 
 func getVertexArrayKeys(keys string) ([]string, error) {
@@ -513,7 +514,7 @@ func getVertexArrayKeys(keys string) ([]string, error) {
 	var keyArray []interface{}
 	err := common.Unmarshal([]byte(keys), &keyArray)
 	if err != nil {
-		return nil, fmt.Errorf("批量添加 Vertex AI 必须使用标准的JsonArray格式，例如[{key1}, {key2}...]，请检查输入: %w", err)
+		return nil, fmt.Errorf("batch add Vertex AI must use standard JsonArray format, e.g. [{key1}, {key2}...], please check input: %w", err)
 	}
 	cleanKeys := make([]string, 0, len(keyArray))
 	for _, key := range keyArray {
@@ -524,7 +525,7 @@ func getVertexArrayKeys(keys string) ([]string, error) {
 		default:
 			bytes, err := json.Marshal(v)
 			if err != nil {
-				return nil, fmt.Errorf("Vertex AI key JSON 编码失败: %w", err)
+				return nil, fmt.Errorf("vertex AI key JSON encoding failed: %w", err)
 			}
 			keyStr = string(bytes)
 		}
@@ -533,7 +534,7 @@ func getVertexArrayKeys(keys string) ([]string, error) {
 		}
 	}
 	if len(cleanKeys) == 0 {
-		return nil, fmt.Errorf("批量添加 Vertex AI 的 keys 不能为空")
+		return nil, fmt.Errorf("batch add Vertex AI keys cannot be empty")
 	}
 	return cleanKeys, nil
 }
@@ -604,7 +605,7 @@ func AddChannel(c *gin.Context) {
 	default:
 		c.JSON(http.StatusOK, gin.H{
 			"success": false,
-			"message": "不支持的添加模式",
+			"message": "Unsupported add mode",
 		})
 		return
 	}
@@ -616,6 +617,13 @@ func AddChannel(c *gin.Context) {
 		}
 		localChannel := addChannelRequest.Channel
 		localChannel.Key = key
+		if addChannelRequest.BatchAddSetKeyPrefix2Name && len(keys) > 1 {
+			keyPrefix := localChannel.Key
+			if len(localChannel.Key) > 8 {
+				keyPrefix = localChannel.Key[:8]
+			}
+			localChannel.Name = fmt.Sprintf("%s %s", localChannel.Name, keyPrefix)
+		}
 		channels = append(channels, *localChannel)
 	}
 	err = model.BatchInsertChannels(channels)
@@ -677,7 +685,7 @@ func DisableTagChannels(c *gin.Context) {
 	if err != nil || channelTag.Tag == "" {
 		c.JSON(http.StatusOK, gin.H{
 			"success": false,
-			"message": "参数错误",
+			"message": "Parameter error",
 		})
 		return
 	}
@@ -700,7 +708,7 @@ func EnableTagChannels(c *gin.Context) {
 	if err != nil || channelTag.Tag == "" {
 		c.JSON(http.StatusOK, gin.H{
 			"success": false,
-			"message": "参数错误",
+			"message": "Parameter error",
 		})
 		return
 	}
@@ -723,14 +731,14 @@ func EditTagChannels(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"success": false,
-			"message": "参数错误",
+			"message": "Parameter error",
 		})
 		return
 	}
 	if channelTag.Tag == "" {
 		c.JSON(http.StatusOK, gin.H{
 			"success": false,
-			"message": "tag不能为空",
+			"message": "tag cannot be empty",
 		})
 		return
 	}
@@ -758,7 +766,7 @@ func DeleteChannelBatch(c *gin.Context) {
 	if err != nil || len(channelBatch.Ids) == 0 {
 		c.JSON(http.StatusOK, gin.H{
 			"success": false,
-			"message": "参数错误",
+			"message": "Parameter error",
 		})
 		return
 	}
@@ -848,7 +856,7 @@ func UpdateChannel(c *gin.Context) {
 						if err != nil {
 							c.JSON(http.StatusOK, gin.H{
 								"success": false,
-								"message": "追加密钥解析失败: " + err.Error(),
+								"message": "Failed to parse appended key: " + err.Error(),
 							})
 							return
 						}
@@ -981,7 +989,7 @@ func BatchSetChannelTag(c *gin.Context) {
 	if err != nil || len(channelBatch.Ids) == 0 {
 		c.JSON(http.StatusOK, gin.H{
 			"success": false,
-			"message": "参数错误",
+			"message": "Parameter error",
 		})
 		return
 	}
@@ -1004,12 +1012,12 @@ func GetTagModels(c *gin.Context) {
 	if tag == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
-			"message": "tag不能为空",
+			"message": "tag cannot be empty",
 		})
 		return
 	}
 
-	channels, err := model.GetChannelsByTag(tag, false) // Assuming false for idSort is fine here
+	channels, err := model.GetChannelsByTag(tag, false)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"success": false,
@@ -1044,16 +1052,16 @@ func GetTagModels(c *gin.Context) {
 // POST /api/channel/copy/:id
 // Optional query params:
 //
-//	suffix         - string appended to the original name (default "_复制")
+//	suffix         - string appended to the original name (default "_copy")
 //	reset_balance  - bool, when true will reset balance & used_quota to 0 (default true)
 func CopyChannel(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		c.JSON(http.StatusOK, gin.H{"success": false, "message": "invalid id"})
+		c.JSON(http.StatusOK, gin.H{"success": false, "message": "Invalid id"})
 		return
 	}
 
-	suffix := c.DefaultQuery("suffix", "_复制")
+	suffix := c.DefaultQuery("suffix", "_copy")
 	resetBalance := true
 	if rbStr := c.DefaultQuery("reset_balance", "true"); rbStr != "" {
 		if v, err := strconv.ParseBool(rbStr); err == nil {
@@ -1134,7 +1142,7 @@ func ManageMultiKeys(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"success": false,
-			"message": "渠道不存在",
+			"message": "Channel does not exist",
 		})
 		return
 	}
@@ -1142,7 +1150,7 @@ func ManageMultiKeys(c *gin.Context) {
 	if !channel.ChannelInfo.IsMultiKey {
 		c.JSON(http.StatusOK, gin.H{
 			"success": false,
-			"message": "该渠道不是多密钥模式",
+			"message": "This channel is not in multi-key mode",
 		})
 		return
 	}
@@ -1270,7 +1278,7 @@ func ManageMultiKeys(c *gin.Context) {
 		if request.KeyIndex == nil {
 			c.JSON(http.StatusOK, gin.H{
 				"success": false,
-				"message": "未指定要禁用的密钥索引",
+				"message": "No key index specified to disable",
 			})
 			return
 		}
@@ -1279,7 +1287,7 @@ func ManageMultiKeys(c *gin.Context) {
 		if keyIndex < 0 || keyIndex >= channel.ChannelInfo.MultiKeySize {
 			c.JSON(http.StatusOK, gin.H{
 				"success": false,
-				"message": "密钥索引超出范围",
+				"message": "Key index out of range",
 			})
 			return
 		}
@@ -1305,7 +1313,7 @@ func ManageMultiKeys(c *gin.Context) {
 		model.InitChannelCache()
 		c.JSON(http.StatusOK, gin.H{
 			"success": true,
-			"message": "密钥已禁用",
+			"message": "Key disabled",
 		})
 		return
 
@@ -1313,7 +1321,7 @@ func ManageMultiKeys(c *gin.Context) {
 		if request.KeyIndex == nil {
 			c.JSON(http.StatusOK, gin.H{
 				"success": false,
-				"message": "未指定要启用的密钥索引",
+				"message": "No key index specified to enable",
 			})
 			return
 		}
@@ -1322,7 +1330,7 @@ func ManageMultiKeys(c *gin.Context) {
 		if keyIndex < 0 || keyIndex >= channel.ChannelInfo.MultiKeySize {
 			c.JSON(http.StatusOK, gin.H{
 				"success": false,
-				"message": "密钥索引超出范围",
+				"message": "Key index out of range",
 			})
 			return
 		}
@@ -1347,10 +1355,9 @@ func ManageMultiKeys(c *gin.Context) {
 		model.InitChannelCache()
 		c.JSON(http.StatusOK, gin.H{
 			"success": true,
-			"message": "密钥已启用",
+			"message": "Key enabled",
 		})
 		return
-
 	case "enable_all_keys":
 		// 清空所有禁用状态，使所有密钥回到默认启用状态
 		var enabledCount int
@@ -1371,10 +1378,9 @@ func ManageMultiKeys(c *gin.Context) {
 		model.InitChannelCache()
 		c.JSON(http.StatusOK, gin.H{
 			"success": true,
-			"message": fmt.Sprintf("已启用 %d 个密钥", enabledCount),
+			"message": fmt.Sprintf("Enabled %d keys", enabledCount),
 		})
 		return
-
 	case "disable_all_keys":
 		// 禁用所有启用的密钥
 		if channel.ChannelInfo.MultiKeyStatusList == nil {
@@ -1404,7 +1410,7 @@ func ManageMultiKeys(c *gin.Context) {
 		if disabledCount == 0 {
 			c.JSON(http.StatusOK, gin.H{
 				"success": false,
-				"message": "没有可禁用的密钥",
+				"message": "No keys available to disable",
 			})
 			return
 		}
@@ -1418,10 +1424,9 @@ func ManageMultiKeys(c *gin.Context) {
 		model.InitChannelCache()
 		c.JSON(http.StatusOK, gin.H{
 			"success": true,
-			"message": fmt.Sprintf("已禁用 %d 个密钥", disabledCount),
+			"message": fmt.Sprintf("Disabled %d keys", disabledCount),
 		})
 		return
-
 	case "delete_disabled_keys":
 		keys := channel.GetKeys()
 		var remainingKeys []string
@@ -1465,7 +1470,7 @@ func ManageMultiKeys(c *gin.Context) {
 		if deletedCount == 0 {
 			c.JSON(http.StatusOK, gin.H{
 				"success": false,
-				"message": "没有需要删除的自动禁用密钥",
+				"message": "No auto-disabled keys to delete",
 			})
 			return
 		}
@@ -1486,7 +1491,7 @@ func ManageMultiKeys(c *gin.Context) {
 		model.InitChannelCache()
 		c.JSON(http.StatusOK, gin.H{
 			"success": true,
-			"message": fmt.Sprintf("已删除 %d 个自动禁用的密钥", deletedCount),
+			"message": fmt.Sprintf("Deleted %d auto-disabled keys", deletedCount),
 			"data":    deletedCount,
 		})
 		return
@@ -1494,7 +1499,7 @@ func ManageMultiKeys(c *gin.Context) {
 	default:
 		c.JSON(http.StatusOK, gin.H{
 			"success": false,
-			"message": "不支持的操作",
+			"message": "Unsupported operation",
 		})
 		return
 	}
