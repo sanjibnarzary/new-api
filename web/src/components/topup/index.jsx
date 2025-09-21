@@ -34,7 +34,6 @@ import { UserContext } from '../../context/User';
 import { StatusContext } from '../../context/Status';
 
 import RechargeCard from './RechargeCard';
-// ...existing code...
 import InvitationCard from './InvitationCard';
 import TransferModal from './modals/TransferModal';
 import PaymentConfirmModal from './modals/PaymentConfirmModal';
@@ -61,9 +60,7 @@ const TopUp = () => {
   const [enableStripeTopUp, setEnableStripeTopUp] = useState(
     statusState?.status?.enable_stripe_topup || false,
   );
-  const [enableRazorpayTopUp, setEnableRazorpayTopUp] = useState(
-    statusState?.status?.enable_razorpay_topup || false,
-  );
+  const [enableRazorpayTopUp, setEnableRazorpayTopUp] = useState(false);
   const [statusLoading, setStatusLoading] = useState(true);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
