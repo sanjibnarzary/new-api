@@ -2,7 +2,7 @@
 
 services:
   new-api:
-    #image: seekgpt-new-api:v0.3.1-mac-test
+    image: seekgpt-new-api:v0.3.1-mac-test
     #image: calciumion/new-api-horizon
     #platform: linux/arm64/v8
     container_name: new-api
