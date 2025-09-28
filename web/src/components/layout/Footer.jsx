@@ -190,24 +190,24 @@ const FooterBar = () => {
 
           <div className='text-sm'>
             <span className='!text-semi-color-text-1'>
-              {t('设计与开发由')}{' '}
+              {t('Designed and Developed by')}{' '}
             </span>
             <a
-              href='https://github.com/QuantumNous/new-api'
+              href='https://ai.seekgpt.org'
               target='_blank'
               rel='noopener noreferrer'
               className='!text-semi-color-primary font-medium'
             >
-              New API
+              SeekGPT
             </a>
             <span className='!text-semi-color-text-1'> & </span>
             <a
-              href='https://github.com/songquanpeng/one-api'
+              href='https://narzary.com'
               target='_blank'
               rel='noopener noreferrer'
               className='!text-semi-color-primary font-medium'
             >
-              One API
+              Narzary AI
             </a>
           </div>
         </div>

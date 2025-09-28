@@ -12,3 +12,5 @@ one-api
 .DS_Store
 tiktoken_cache
 .eslintcache
+building-docker.md
+some.txt
