@@ -1,1 +1,1 @@
-docker build --platform
+docker build --platform linux/arm64/v8 -t ghcr.io/sanjibnarzary/new-api:v0.3.2-indic-rp-arm .
