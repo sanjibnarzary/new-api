@@ -16,6 +16,7 @@ import (
 	"one-api/setting/ratio_setting"
 	"os"
 	"strconv"
+	"time"
 
 	"github.com/bytedance/gopkg/util/gopool"
 	"github.com/gin-contrib/sessions"
@@ -33,6 +34,7 @@ var buildFS embed.FS
 var indexPage []byte
 
 func main() {
+	startTime := time.Now()
 
 	err := InitResources()
 	if err != nil {
@@ -150,6 +152,10 @@ func main() {
 	if port == "" {
 		port = strconv.Itoa(*common.Port)
 	}
+
+	// Log startup success message
+	common.LogStartupSuccess(startTime, port)
+
 	err = server.Run(":" + port)
 	if err != nil {
 		common.FatalLog("failed to start HTTP server: " + err.Error())
@@ -161,7 +167,7 @@ func InitResources() error {
 	// This is a placeholder function for future resource initialization
 	err := godotenv.Load(".env")
 	if err != nil {
-		common.SysLog("未找到 .env 文件，使用默认环境变量，如果需要，请创建 .env 文件并设置相关变量")
+		common.SysLog("No .env file found, using default environment variables. If needed, please create a .env file and set the relevant variables.")
 		common.SysLog("No .env file found, using default environment variables. If needed, please create a .env file and set the relevant variables.")
 	}
 

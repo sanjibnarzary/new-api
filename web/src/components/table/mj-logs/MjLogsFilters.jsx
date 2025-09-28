@@ -21,6 +21,8 @@ import React from 'react';
 import { Button, Form } from '@douyinfe/semi-ui';
 import { IconSearch } from '@douyinfe/semi-icons';
 
+import { DATE_RANGE_PRESETS } from '../../../constants/console.constants';
+
 const MjLogsFilters = ({
   formInitValues,
   setFormApi,
@@ -44,35 +46,40 @@ const MjLogsFilters = ({
     >
       <div className='flex flex-col gap-2'>
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2'>
-          {/* 时间选择器 */}
+          {/* Date Range Picker */}
           <div className='col-span-1 lg:col-span-2'>
             <Form.DatePicker
               field='dateRange'
               className='w-full'
               type='dateTimeRange'
-              placeholder={[t('开始时间'), t('结束时间')]}
+              placeholder={['Start Time', 'End Time']}
               showClear
               pure
               size='small'
+              presets={DATE_RANGE_PRESETS.map(preset => ({
+                text: t(preset.text),
+                start: preset.start(),
+                end: preset.end()
+              }))}
             />
           </div>
 
-          {/* 任务 ID */}
+          {/* Task ID */}
           <Form.Input
             field='mj_id'
             prefix={<IconSearch />}
-            placeholder={t('任务 ID')}
+            placeholder='Task ID'
             showClear
             pure
             size='small'
           />
 
-          {/* 渠道 ID - 仅管理员可见 */}
+          {/* Channel ID - Admin only */}
           {isAdminUser && (
             <Form.Input
               field='channel_id'
               prefix={<IconSearch />}
-              placeholder={t('渠道 ID')}
+              placeholder='Channel ID'
               showClear
               pure
               size='small'
@@ -80,7 +87,7 @@ const MjLogsFilters = ({
           )}
         </div>
 
-        {/* 操作按钮区域 */}
+        {/* Action Buttons Area */}
         <div className='flex justify-between items-center'>
           <div></div>
           <div className='flex gap-2'>
@@ -90,7 +97,7 @@ const MjLogsFilters = ({
               loading={loading}
               size='small'
             >
-              {t('查询')}
+              Search
             </Button>
             <Button
               type='tertiary'
@@ -104,14 +111,14 @@ const MjLogsFilters = ({
               }}
               size='small'
             >
-              {t('重置')}
+              Reset
             </Button>
             <Button
               type='tertiary'
               onClick={() => setShowColumnSelector(true)}
               size='small'
             >
-              {t('列设置')}
+              Column Settings
             </Button>
           </div>
         </div>

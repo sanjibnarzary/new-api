@@ -172,7 +172,7 @@ export function PreCode(props) {
             transition: 'opacity 0.2s ease',
           }}
         >
-          <Tooltip content={t('复制代码')}>
+          <Tooltip content={t('Copy code')}>
             <Button
               size='small'
               theme='borderless'
@@ -181,13 +181,13 @@ export function PreCode(props) {
                 e.preventDefault();
                 e.stopPropagation();
                 if (ref.current) {
-                  const code =
-                    ref.current.querySelector('code')?.innerText ?? '';
+                  const codeElement = ref.current.querySelector('code');
+                  const code = codeElement?.textContent ?? '';
                   copy(code).then((success) => {
                     if (success) {
-                      Toast.success(t('代码已复制到剪贴板'));
+                        Toast.success(t('Code copied to clipboard'));
                     } else {
-                      Toast.error(t('复制失败，请手动复制'));
+                        Toast.error(t('Copy failed, please copy manually'));
                     }
                   });
                 }
@@ -225,7 +225,7 @@ export function PreCode(props) {
               color: 'var(--semi-color-text-2)',
             }}
           >
-            HTML预览:
+            HTML Preview:
           </div>
           <div dangerouslySetInnerHTML={{ __html: htmlCode }} />
         </div>
