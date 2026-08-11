@@ -20,6 +20,7 @@ export const INTERFACE_LANGUAGE_OPTIONS = [
   { code: 'zhCN', label: '简体中文' },
   { code: 'en', label: 'English' },
   { code: 'brx', label: 'बर\' (Bodo)' },
+  { code: 'hi', label: 'हिन्दी' },
   { code: 'fr', label: 'Français' },
   { code: 'ru', label: 'Русский' },
   { code: 'ja', label: '日本語' },
